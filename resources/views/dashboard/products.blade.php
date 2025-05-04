@@ -11,7 +11,7 @@
 <div class="main-content-inner">                            
     <div class="main-content-wrap">
         <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-            <h3>Categories</h3>
+            <h3>Products</h3>
             <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                 <li>
                     <a href="{{route('admin.index')}}">
@@ -22,7 +22,7 @@
                     <i class="icon-chevron-right"></i>
                 </li>
                 <li>
-                    <div class="text-tiny">Categories</div>
+                    <div class="text-tiny">Products</div>
                 </li>
             </ul>
         </div>
@@ -39,7 +39,7 @@
                         </div>
                     </form>
                 </div>
-                <a class="tf-button style-1 w208" href="{{route('admin.categories.add')}}"><i class="icon-plus"></i>Add new</a>
+                <a class="tf-button style-1 w208" href="{{route('admin.product.add')}}"><i class="icon-plus"></i>Add new</a>
             </div>
             <div class="wg-table table-all-user">
                 <div class="table-responsive">
@@ -49,28 +49,43 @@
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>No</th>
+                                <th>Image</th>
                                 <th class="p-2">Name</th>
-                                <th>Slug</th>
-                                <th>Products</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Supplier</th>
+                                <th>Price</th>
+                                <th>Stock</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($categories as $category)
+                            @foreach ($products as $product)
                             <tr>
-                                <td>{{$category->id}}</td>
-                                <td class="p-2">{{$category->name}}</td>
-                                <td>{{$category->slug}}</td>
-                                <td><a href="" target="_blank">0</a></td>
+                                <td>{{$product->id}}</td>
+                                <td>
+                                    <img src="{{asset('uploads/products')}}/{{$product->image}}" alt="" style="width:80px;">
+                                </td>
+                                <td class="pname">
+                                    <div class="name">
+                                        <a href="#" class="body-title-2">{{$product->name}}</a>
+                                        <div class="text-tiny mt-3">{{$product->slug}}</div>
+                                    </div>  
+                                </td>
+                                <td>{{$product->category->name ?? '-' }}</td>
+                                <td>{{$product->brand->name ?? '-' }}</td>
+                                <td>{{$product->supplier->name ?? '-' }}</td>
+                                <td>{{$product->price}}</td>
+                                <td>{{$product->quantity}}</td>
                                 <td>
                                     <div class="list-icon-function">
                                         <div class="item edit">
-                                            <a href="{{route('admin.categories.edit',['id'=>$category->id])}}">                                     
+                                            <a href="{{route('admin.product.edit',['id'=>$product->id])}}">                                     
                                                 <i class="icon-edit-3"></i>
                                             </a>
                                         </div>
-                                        <form action="{{route('admin.categories.delete',['id'=>$category->id])}}" method="POST">
+                                        <form action="{{route('admin.product.delete',['id'=>$product->id])}}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <div class="item text-danger delete">
@@ -84,13 +99,14 @@
                         </tbody>
                     </table>                
                 </div>
-                <div class="divider">
-                    <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">
-                        {{$categories->links('pagination::bootstrap-5')}}
-                    </div>
+            <div class="divider">
+                <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">
+                    {{$products->links('pagination::bootstrap-5')}}
                 </div>
             </div>
+           
         </div>
+    </div>
 </div>
 @endsection
 

@@ -11,7 +11,7 @@
 <div class="main-content-inner">                            
     <div class="main-content-wrap">
         <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-            <h3>Categories</h3>
+            <h3>Suppliers</h3>
             <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                 <li>
                     <a href="{{route('admin.index')}}">
@@ -22,7 +22,7 @@
                     <i class="icon-chevron-right"></i>
                 </li>
                 <li>
-                    <div class="text-tiny">Categories</div>
+                    <div class="text-tiny">Suppliers</div>
                 </li>
             </ul>
         </div>
@@ -39,7 +39,7 @@
                         </div>
                     </form>
                 </div>
-                <a class="tf-button style-1 w208" href="{{route('admin.categories.add')}}"><i class="icon-plus"></i>Add new</a>
+                <a class="tf-button style-1 w208" href="{{route('admin.supplier.add')}}"><i class="icon-plus"></i>Add new</a>
             </div>
             <div class="wg-table table-all-user">
                 <div class="table-responsive">
@@ -53,24 +53,28 @@
                                 <th class="p-2">Name</th>
                                 <th>Slug</th>
                                 <th>Products</th>
+                                <th>Phone Number</th>
+                                <th>Address</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($categories as $category)
+                            @foreach ($suppliers as $supplier)
                             <tr>
-                                <td>{{$category->id}}</td>
-                                <td class="p-2">{{$category->name}}</td>
-                                <td>{{$category->slug}}</td>
+                                <td>{{$supplier->id}}</td>
+                                <td class="p-2">{{$supplier->name}}</td>
+                                <td>{{$supplier->slug}}</td>
                                 <td><a href="" target="_blank">0</a></td>
+                                <td>{{$supplier->phone_number}}</td>
+                                <td>{{$supplier->address}}</td>
                                 <td>
                                     <div class="list-icon-function">
                                         <div class="item edit">
-                                            <a href="{{route('admin.categories.edit',['id'=>$category->id])}}">                                     
+                                            <a href="{{route('admin.supplier.edit',['id'=>$supplier->id])}}">                                     
                                                 <i class="icon-edit-3"></i>
                                             </a>
                                         </div>
-                                        <form action="{{route('admin.categories.delete',['id'=>$category->id])}}" method="POST">
+                                        <form action="{{route('admin.supplier.delete',['id'=>$supplier->id])}}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <div class="item text-danger delete">
@@ -86,7 +90,7 @@
                 </div>
                 <div class="divider">
                     <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">
-                        {{$categories->links('pagination::bootstrap-5')}}
+                        {{$suppliers->links('pagination::bootstrap-5')}}
                     </div>
                 </div>
             </div>

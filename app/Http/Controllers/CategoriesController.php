@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categories;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -13,9 +14,10 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories = Categories::paginate(10);
+        $categories = Categories::orderBy('id','asc')->paginate(10);
         return view('dashboard.categories', compact('categories'));
     }
+
     /**
      * Show the form for creating a new resource.
      */

@@ -25,7 +25,7 @@
 
 <body class="body">
 <div id="wrapper">
-  <div id="page" class="">
+  <div id="page">
     <div class="layout-wrap">
       @include('dashboard.sidebar')
       <div class="section-content-right">
@@ -33,8 +33,8 @@
 
         <!-- Main Content -->
         <div class="main-content">
-        @yield('container')
-        @include('dashboard.footer')
+            @yield('container')
+            @include('dashboard.footer')
         </div>
       </div>
     </div>

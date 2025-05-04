@@ -4,8 +4,6 @@
           <div class="button-show-hide">
               <i class="icon-menu-left"></i>
           </div>
-
-
           <form class="form-search flex-grow">
               <fieldset class="name">
                   <input type="text" placeholder="Search here..." class="show-search" name="name"

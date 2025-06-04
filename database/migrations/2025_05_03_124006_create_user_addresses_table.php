@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('user_addresses', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id'); // Foreign key ke users
+            $table->string('name');                // Nama penerima
+            $table->string('phone');               // No HP
+            $table->string('province');
+            $table->string('city');
+            $table->text('address');               // Alamat lengkap
+            $table->string('post_code');           // Kode pos
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

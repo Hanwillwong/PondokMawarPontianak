@@ -43,7 +43,7 @@ class ProductsController extends Controller
         // Debug untuk memastikan data yang dikirimkan
         // dd($request->all());
 
-        // Validasi input dari form
+        //  Validasi input dari form
         $request->validate([
             'name' => 'required',
             'slug' => 'required|unique:products,slug',
@@ -105,27 +105,29 @@ class ProductsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(products $products)
+   public function show($id)
     {
-        //
+        $product = Products::with('product_price')->findOrFail($id);
+
+        $cart = session()->get('cart', []);
+        $qtyInCart = isset($cart[$product->id]) ? $cart[$product->id]['quantity'] : 0;
+
+        return view('pages.product-details', compact('product', 'qtyInCart'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit($id)
     {
-
-
         $categories = categories::all();
-        $product_prices = product_prices::all();
         $brands = Brands::all();
         $suppliers = suppliers::all();
-        $product = products::findOrFail($id); // Gunakan findOrFail agar error jika ID tidak ditemukan
+        $product = products::with('product_price')->findOrFail($id);
 
         return view('dashboard.products-edit', [
             'product' => $product,
-            'product_prices' => $product_prices,
             'categories' => $categories,
             'brands' => $brands,
             'suppliers' => $suppliers,
@@ -135,10 +137,72 @@ class ProductsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, products $products)
+    public function update(Request $request, products $product)
     {
-        //
+        // Validate input
+        // dd($request->all(), $product->id);
+        $request->validate([
+            'name' => 'required',
+            'slug' => 'required|unique:products,slug,' . $product->id, // Ensure we exclude current product from slug uniqueness check
+            'category_id' => 'required',
+            'brand_id' => 'required',
+            'supplier_id' => 'required',
+            'description' => 'required',
+            'quantity' => 'required|numeric|min:0',
+            'image' => 'nullable|mimes:png,jpg,jpeg|max:2048',
+            'prices' => 'required|array',
+            'prices.*.min_qty' => 'required|numeric|min:1',
+            'prices.*.price' => 'required|numeric|min:0',
+        ]);
+
+        // Update product details
+        $product->name = $request->name;
+        $product->slug = $request->slug;
+        $product->description = $request->description;
+        $product->quantity = $request->quantity;
+        $product->category_id = $request->category_id;
+        $product->brand_id = $request->brand_id;
+        $product->supplier_id = $request->supplier_id;
+
+        // Handle image upload
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->extension();
+            $image->move(public_path('uploads/products'), $imageName);
+
+            // Remove the old image if exists
+            if ($product->image && file_exists(public_path('uploads/products/' . $product->image))) {
+                unlink(public_path('uploads/products/' . $product->image));
+            }
+
+            $product->image = $imageName;
+        }
+
+        // Save the product
+        $product->save();
+
+        // Remove old prices (if full update required)
+        product_prices::where('product_id', $product->id)->delete();
+
+        // Save new prices
+        foreach ($request->prices as $price) {
+            product_prices::create([
+                'product_id' => $product->id,
+                'min_quantity' => $price['min_qty'],
+                'price' => $price['price'],
+            ]);
+
+            // Set price to product if min_qty == 1
+            if ($price['min_qty'] == 1) {
+                $product->price = $price['price'];
+                $product->save();
+            }
+        }
+
+        return redirect()->route('admin.products')->with('status', 'Product has been updated successfully!');
     }
+
+
 
     /**
      * Remove the specified resource from storage.

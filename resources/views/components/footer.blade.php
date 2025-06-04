@@ -4,8 +4,8 @@
       <div class="row row-cols-lg-5 row-cols-2">
         <div class="footer-column footer-store-info col-12 mb-4 mb-lg-0">
           <div class="logo">
-            <a href="index.html">
-              <img src="assets/images/logo.png" alt="SurfsideMedia" class="logo__image d-block" />
+            <a href="index.html" class="fs-3">
+              Pondok Mawar
             </a>
           </div>
           <p class="footer-address">123 Beach Avenue, Surfside City, CA 00000</p>

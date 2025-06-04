@@ -28,7 +28,7 @@
             <form class="form-new-product form-style-1" action="{{route('admin.supplier.update')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="id" value="{{$supplier->id}}" />
+                <input type="hidden" name="id" value="{{$supplier->id}}"/>
                 <fieldset class="name">
                     <div class="body-title">Suppliers Name <span class="tf-color-1">*</span></div>
                     <input class="flex-grow" type="text" placeholder="Category name" name="name" tabindex="0" value="{{$supplier->name}}" aria-required="true" required="">

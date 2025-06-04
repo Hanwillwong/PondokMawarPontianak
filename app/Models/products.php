@@ -26,6 +26,6 @@ class products extends Model
 
     public function product_price()
     {
-        return $this->belongsTo(product_prices::class,'product_id');
+        return $this->hasMany(product_prices::class, 'product_id');
     }
 }

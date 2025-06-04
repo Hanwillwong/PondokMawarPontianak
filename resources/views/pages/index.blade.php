@@ -129,21 +129,28 @@
           }
         }'>
         <div class="swiper-wrapper">
+          @foreach($categories as $category)
           <div class="swiper-slide">
-            <img loading="lazy" class="w-100 h-auto mb-3" src="assets/images/home/demo3/category_1.png" width="124"
-              height="124" alt="" />
+          @if($category->sampleProduct && $category->sampleProduct->image)
+            <div style="width: 124px; height: 124px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f0f0f0;">
+                <img src="{{ asset('uploads/products/' . $category->sampleProduct->image) }}" alt="" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+          @else
+            <p>No image available</p>
+          @endif
             <div class="text-center">
-              <a href="#" class="menu-link fw-medium">Women<br />Tops</a>
+              <a href="#" class="menu-link fw-medium">{{ $category->name }}</a>
             </div>
           </div>
-          <div class="swiper-slide">
+          @endforeach
+          <!-- <div class="swiper-slide">
             <img loading="lazy" class="w-100 h-auto mb-3" src="assets/images/home/demo3/category_2.png" width="124"
               height="124" alt="" />
             <div class="text-center">
               <a href="#" class="menu-link fw-medium">Women<br />Pants</a>
             </div>
-          </div>
-          <div class="swiper-slide">
+          </div> -->
+          <!-- <div class="swiper-slide">
             <img loading="lazy" class="w-100 h-auto mb-3" src="assets/images/home/demo3/category_3.png" width="124"
               height="124" alt="" />
             <div class="text-center">
@@ -156,8 +163,8 @@
             <div class="text-center">
               <a href="#" class="menu-link fw-medium">Men<br />Jeans</a>
             </div>
-          </div>
-          <div class="swiper-slide">
+          </div> -->
+          <!-- <div class="swiper-slide">
             <img loading="lazy" class="w-100 h-auto mb-3" src="assets/images/home/demo3/category_5.png" width="124"
               height="124" alt="" />
             <div class="text-center">
@@ -184,7 +191,7 @@
             <div class="text-center">
               <a href="#" class="menu-link fw-medium">Kids<br />Tops</a>
             </div>
-          </div>
+          </div> -->
         </div><!-- /.swiper-wrapper -->
       </div><!-- /.swiper-container js-swiper-slider -->
 
@@ -615,46 +622,31 @@
   <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
   <section class="products-grid container">
-    <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Featured Products</h2>
+    <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Products</h2>
 
     <div class="row">
+    @foreach ($products as $product)
       <div class="col-6 col-md-4 col-lg-3">
         <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
           <div class="pc__img-wrapper">
-            <a href="details.html">
-              <img loading="lazy" src="assets/images/home/demo3/product-4.jpg" width="330" height="400"
+            <a href="{{ route('product.show', $product->id) }}">
+              <img loading="lazy" src="{{asset('uploads/products')}}/{{$product->image}}" width="330" height="400"
                 alt="Cropped Faux leather Jacket" class="pc__img">
             </a>
           </div>
 
           <div class="pc__info position-relative">
-            <h6 class="pc__title"><a href="details.html">Cropped Faux Leather Jacket</a></h6>
+            <h6 class="pc__title"><a href="details.html">{{$product->name}}</a></h6>
             <div class="product-card__price d-flex align-items-center">
-              <span class="money price text-secondary">$29</span>
-            </div>
-
-            <div
-              class="anim_appear-bottom position-absolute bottom-0 start-0 d-none d-sm-flex align-items-center bg-body">
-              <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart js-open-aside"
-                data-aside="cartDrawer" title="Add To Cart">Add To Cart</button>
-              <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-quick-view"
-                data-bs-toggle="modal" data-bs-target="#quickView" title="Quick view">
-                <span class="d-none d-xxl-block">Quick View</span>
-                <span class="d-block d-xxl-none"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <use href="#icon_view" />
-                  </svg></span>
-              </button>
-              <button class="pc__btn-wl bg-transparent border-0 js-add-wishlist" title="Add To Wishlist">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <use href="#icon_heart" />
-                </svg>
-              </button>
+              <span class="money price text-secondary">Rp. {{ number_format($product->price, 0, ',', '.') }}</span>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-6 col-md-4 col-lg-3">
+    @endforeach
+
+      
+      <!-- <div class="col-6 col-md-4 col-lg-3">
         <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
           <div class="pc__img-wrapper">
             <a href="details.html">
@@ -909,7 +901,8 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
+
     </div><!-- /.row -->
 
     <div class="text-center mt-2">

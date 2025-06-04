@@ -15539,3 +15539,10 @@ body.coming-soon-page {
     display: none; }
   .btn-video-player.playing svg.btn-pause {
     display: block; }
+
+.qty-control__reduce.disabled,
+.qty-control__increase.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+

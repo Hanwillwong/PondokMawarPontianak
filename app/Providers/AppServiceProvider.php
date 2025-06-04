@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Session;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,5 +30,12 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('owner', function(User $user){
             return $user->user_type === 'owner';
         });
+
+        View::composer('*', function ($view) {
+        $cart = Session::get('cart', []);
+        $cartItemCount = collect($cart)->sum('quantity'); // jumlah semua item
+        $view->with('cartItemCount', $cartItemCount);
+    });
+
     }
 }

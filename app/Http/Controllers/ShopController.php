@@ -1,21 +1,19 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\products;
-use App\Models\categories;
-use App\Models\Brands;
-use App\Models\product_prices;
-use App\Models\suppliers;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
-class HomeController extends Controller
+use Illuminate\Http\Request;
+use App\Models\products;
+use App\Models\brands;
+use App\Models\categories;
+
+class ShopController extends Controller
 {
     public function index()
     {
+        $brands = Brands::all();
         $categories = Categories::with('sampleProduct')->get();
         $products = Products::with(['brand', 'supplier', 'category'])->orderBy('id', 'asc')->paginate(10);
-        return view('pages.index',compact('products','categories'));
+        return view('pages.shop',compact('products','categories','brands'));
     }
-
 }

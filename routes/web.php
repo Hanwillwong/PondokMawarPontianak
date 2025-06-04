@@ -15,6 +15,8 @@ use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\EcommerceController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
@@ -44,8 +46,17 @@ Auth::routes();
 
 Route::get('/', [HomeController::class, 'index'])->name('pages.index');
 
+Route::get('/product/{id}', [ProductsController::class, 'show'])->name('product.show');
+
 Route::middleware(['auth'])->group(function(){
     Route::get('/account-dashboard',[AccountController::class,'index'])->name('pages.account');
+    Route::get('/account-address',[AccountController::class,'index_address'])->name('pages.account-address');
+    Route::get('/account-address/add',[AccountController::class,'create_address'])->name('pages.account-address.add');
+    Route::post('/account-address/store',[AccountController::class,'store_address'])->name('pages.account-address.store');
+    Route::get('/account/address/{id}/edit', [AccountController::class, 'edit_address'])->name('pages.account-address.edit');
+    Route::put('/account/address/{id}', [AccountController::class, 'update_address'])->name('pages.account-address.update');
+    Route::post('/midtrans/token', [CartController::class, 'createSnapToken'])->name('midtrans.token');
+
 });
 Route::middleware([AuthAdmin::class])->group(function(){
     Route::get('/admin',[AdminController::class,'index'])->name('admin.index');
@@ -75,6 +86,20 @@ Route::middleware([AuthAdmin::class])->group(function(){
     Route::get('/admin/product/add',[ProductsController::class,'create'])->name('admin.product.add');
     Route::post('/admin/product/store',[ProductsController::class,'store'])->name('admin.product.store');
     Route::get('/admin/product/edit/{id}',[ProductsController::class,'edit'])->name('admin.product.edit');
-    Route::put('/admin/product/update',[ProductsController::class,'update'])->name('admin.product.update');
+    Route::put('/admin/product/update/{product}',[ProductsController::class,'update'])->name('admin.product.update');
     Route::delete('/admin/product/{id}/delete',[ProductsController::class,'destroy'])->name('admin.product.delete');
+
+    Route::get('/cart',[CartController::class,'index'])->name('cart');
+    Route::post('/cart/add',[CartController::class,'add'])->name('cart.add');
+    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/delete',[CartController::class,'destroy'])->name('cart.delete');
+
+    Route::get('/checkout',[CartController::class,'index_checkout'])->name('checkout');
+    
+    Route::get('/shop',[ShopController::class,'index'])->name('shop');
+    // Route::get('/shop/add',[ShopController::class,'create'])->name('shop.add');
+    // Route::post('/shop/store',[ShopController::class,'store'])->name('shop.store');
+    // Route::get('/shop/edit/{id}',[ShopController::class,'edit'])->name('shop.edit');
+    // Route::put('/shop/update',[ShopController::class,'update'])->name('shop.update');
+    // Route::delete('/shop/{id}/delete',[ShopController::class,'destroy'])->name('shop.delete');
 });

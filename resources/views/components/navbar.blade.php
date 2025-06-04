@@ -8,16 +8,16 @@
       </a>
 
       <div class="logo">
-        <a href="{{route('pages.index')}}">
+        <a href="{{route('pages.index')}}" class="fs-3">
           Pondok Mawar
         </a>
       </div>
 
-      <a href="#" class="header-tools__item header-tools__cart js-open-aside" data-aside="cartDrawer">
+      <a href="{{route('cart')}}" class="header-tools__item header-tools__cart" data-aside="">
         <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <use href="#icon_cart" />
         </svg>
-        <span class="cart-amount d-block position-absolute js-cart-items-count">3</span>
+        <span class="cart-amount d-block position-absolute js-cart-items-count">{{ $cartItemCount }}</span>
       </a>
     </div>
 
@@ -49,10 +49,10 @@
               <a href="{{route('pages.index')}}" class="navigation__link">Home</a>
             </li>
             <li class="navigation__item">
-              <a href="shop.html" class="navigation__link">Shop</a>
+              <a href="{{route('shop')}}" class="navigation__link">Shop</a>
             </li>
             <li class="navigation__item">
-              <a href="cart.html" class="navigation__link">Cart</a>
+              <a href="{{route('cart')}}" class="navigation__link">Cart</a>
             </li>
             <li class="navigation__item">
               <a href="about.html" class="navigation__link">About</a>
@@ -65,13 +65,27 @@
       </div>
 
       <div class="border-top mt-auto pb-2">
-        <div class="customer-links container mt-4 mb-2 pb-1">
-          <svg class="d-inline-block align-middle" width="20" height="20" viewBox="0 0 20 20" fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <use href="#icon_user" />
-          </svg>
-          <span class="d-inline-block ms-2 text-uppercase align-middle fw-medium">My Account</span>
-        </div>
+        
+
+        @guest
+          <div class="customer-links container mt-4 mb-2 pb-1">
+            <svg class="d-inline-block align-middle" width="20" height="20" viewBox="0 0 20 20" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <use href="#icon_user" />
+            </svg>
+            <!-- <span >My Account</span> -->
+            <a href="{{route('pages.account')}}" class="d-inline-block ms-2 text-uppercase align-middle fw-medium">My Account</a>
+          </div>
+          @else             
+            <div class="customer-links container mt-4 mb-2 pb-1">
+              <svg class="d-inline-block align-middle" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <use href="#icon_user" />
+              </svg>
+              <!-- <span >My Account</span> -->
+              <a href="{{ Auth::user()->role=='admin' ? route('admin.index') : route('pages.account')}}" class="d-inline-block ms-2 text-uppercase align-middle fw-medium">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</a>
+            </div>       
+          @endif
 
 
 
@@ -127,7 +141,7 @@
     <div class="container">
       <div class="header-desk header-desk_type_1">
         <div class="logo">
-          <a href="{{route('pages.index')}}">
+          <a href="{{route('pages.index')}}" class="fs-4">
             Pondok Mawar
           </a>
         </div>
@@ -138,10 +152,10 @@
               <a href="{{route('pages.index')}}" class="navigation__link">Home</a>
             </li>
             <li class="navigation__item">
-              <a href="shop.html" class="navigation__link">Shop</a>
+              <a href="{{route('shop')}}" class="navigation__link">Shop</a>
             </li>
             <li class="navigation__item">
-              <a href="cart.html" class="navigation__link">Cart</a>
+              <a href="{{route('cart')}}" class="navigation__link">Cart</a>
             </li>
             <li class="navigation__item">
               <a href="about.html" class="navigation__link">About</a>
@@ -224,12 +238,14 @@
             </svg>
           </a>
 
-          <a href="cart.html" class="header-tools__item header-tools__cart">
+          
+
+          <a href="{{route('cart')}}" class="header-tools__item header-tools__cart">
             <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
               xmlns="http://www.w3.org/2000/svg">
               <use href="#icon_cart" />
             </svg>
-            <span class="cart-amount d-block position-absolute js-cart-items-count">3</span>
+            <span class="cart-amount d-block position-absolute js-cart-items-count">{{ $cartItemCount }}</span>
           </a>
         </div>
       </div>

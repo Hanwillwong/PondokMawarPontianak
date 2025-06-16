@@ -40,7 +40,7 @@
                      <h2>Register</h2>
                      {{-- <p>We are happy to have you back.</p> --}}
                 </div>
-            <form action="{{ url('/register') }}" method="post">
+            <form action="{{ secure_url('/register') }}" method="post">
                 @csrf
                 <div class="input-group mb-3">
                     <input type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Name" name="name" required>

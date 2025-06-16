@@ -41,6 +41,8 @@
                         <div class="card-body">
                             <form action="{{ route('pages.account-address.store') }}" method="POST">
                             @csrf
+                            <input type="hidden" name="redirect_to" value="{{ request('redirect', route('pages.account-address')) }}">
+                            
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-floating my-3">

@@ -1331,13 +1331,13 @@ function pureFadeOut(e) {
     return new bootstrap.Popover(popoverTriggerEl, {'html':true})
   });
 
-  $('.shopping-cart .btn-checkout').off('click').on('click', function() {
-    window.location.href='./shop_checkout.html';
-  });
+  // $('.shopping-cart .btn-checkout').off('click').on('click', function() {
+  //   window.location.href='./shop_checkout.html';
+  // });
 
-  $('.checkout-form .btn-checkout').off('click').on('click', function() {
-    window.location.href='./shop_order_complete.html';
-  });
+  // $('.checkout-form .btn-checkout').off('click').on('click', function() {
+  //   window.location.href='./shop_order_complete.html';
+  // });
 
   const showRegisterBtn = document.querySelector('.js-show-register');
   if (showRegisterBtn) {

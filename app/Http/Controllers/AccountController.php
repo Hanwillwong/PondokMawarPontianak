@@ -6,6 +6,7 @@ use App\Models\account;
 use App\Models\user_addresses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\orders;
 
 class AccountController extends Controller
 {
@@ -64,8 +65,9 @@ class AccountController extends Controller
             'address' => $request->address,
             'post_code' => $request->post_code,
         ]);
-
-        return redirect()->route('pages.account-address')->with('success', 'Alamat berhasil disimpan!');
+        
+        return redirect($request->input('redirect_to', route('pages.account-address')))
+        ->with('success', 'Alamat berhasil disimpan!');
     }
     
     /**
@@ -138,5 +140,15 @@ class AccountController extends Controller
     public function destroy(account $account)
     {
         //
+    }
+
+    public function orders()
+    {
+        $orders = Orders::with('order_detail.product', 'status')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
+
+        return view('pages.account-orders', compact('orders'));
     }
 }

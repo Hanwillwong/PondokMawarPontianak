@@ -7,9 +7,14 @@ use App\Models\user_addresses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\products;
+use App\Models\status;
+use App\Models\orders;
+use App\Models\order_details;
 use App\Models\categories;
 use Midtrans\Snap;
 use Midtrans\Config;
+use Exception;
+
 
 class CartController extends Controller
 {
@@ -47,6 +52,10 @@ class CartController extends Controller
         }
 
         return view('pages.cart', compact('cartDetails'));
+    }
+
+    public function index_confirmation() {
+        return view('pages.order-confirmation');
     }
 
 
@@ -118,7 +127,7 @@ class CartController extends Controller
     {
         //
     }
-
+    
 
     /**
      * Display the specified resource.
@@ -139,7 +148,127 @@ class CartController extends Controller
     /**
      * Update the specified resource in storage.
      */
- 
+    public function store(Request $request)
+    {
+        $user = auth()->user();
+        $cart = session('cart', []);
+
+        if (empty($cart)) {
+            return redirect()->route('cart')->with('error', 'Keranjang belanja kosong.');
+        }
+
+        $purchase_type = $request->input('shipping_method'); // pickup / delivery
+        $paymentMethod = $request->input('payment_method');   // cod / midtrans
+        $addressId = $request->input('address_id');           // required jika delivery
+
+        if ($purchase_type === 'delivery' && $paymentMethod === 'cod') {
+            return response()->json(['error' => 'COD hanya tersedia untuk pickup'], 400);
+        }
+        
+        if ($purchase_type === 'delivery' && !$addressId) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Silakan pilih alamat pengiriman.'], 400);
+            }
+            return back()->with('error', 'Silakan pilih alamat pengiriman.');
+        }
+
+        // Ambil produk dari database
+        $productIds = array_keys($cart);
+        $products = \App\Models\products::with('product_price')->whereIn('id', $productIds)->get()->keyBy('id');
+
+        $total = 0;
+        $orderDetails = [];
+
+        foreach ($cart as $productId => $item) {
+            $product = $products[$productId] ?? null;
+            if (!$product) continue;
+
+            $quantity = $item['quantity'];
+            $price = $product->price;
+
+            foreach ($product->product_price as $tier) {
+                if ($quantity >= $tier->min_quantity) {
+                    $price = $tier->price;
+                }
+            }
+
+            $subtotal = $price * $quantity;
+            $total += $subtotal;
+
+            $orderDetails[] = [
+                'product_id' => $product->id,
+                'price_at_order' => $price,
+                'quantity' => $quantity,
+                'subtotal' => $subtotal,
+            ];
+        }
+
+        // Simpan order
+        $order = new \App\Models\orders();
+        $order->user_id = $user->id;
+        $order->status_id = Status::where('label', $paymentMethod === 'midtrans' ? 'pending' : 'processing')->first()->id;
+        $order->total_price = $total;
+        $order->payment_method = $paymentMethod;
+        $order->purchase_type = $purchase_type;
+        $order->address_id = $purchase_type === 'delivery' ? $addressId : null;
+        $order->reference_number = 'ORD-' . strtoupper(Str::random(10));
+        $order->save();
+
+        // Setelah simpan order dan order_details
+        foreach ($orderDetails as $detail) {
+            $detail['order_id'] = $order->id;
+            order_details::create($detail);
+        }
+
+        // Buat item_details untuk Midtrans
+        $items = [];
+        foreach ($order->order_detail as $detail) {
+            $product = Products::find($detail['product_id']);
+            $items[] = [
+                'id' => $detail['product_id'],
+                'price' => $detail['price_at_order'],
+                'quantity' => $detail['quantity'],
+                'name' => Str::limit(preg_replace('/[^A-Za-z0-9 ]/', '', $product->name), 50),
+            ];
+        }
+
+        $address = $order->address_id ? user_addresses::find($order->address_id) : null;
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order->reference_number,
+                'gross_amount' => max($order->total_price, 100),
+            ],
+            'item_details' => $items,
+            'customer_details' => [
+                'first_name' => $user->name,
+                'email' => $user->email,
+                'shipping_address' => $address ? [
+                    'first_name' => $address->name,
+                    'phone' => $address->phone,
+                    'address' => $address->address,
+                    'city' => $address->city,
+                    'postal_code' => $address->post_code,
+                    'country_code' => 'IDN',
+                ] : [],
+            ],
+        ];
+
+        $snapToken = Snap::getSnapToken($params);
+
+        // ✅ Kosongkan cart (opsional)
+        session()->forget('cart');
+
+        // ✅ Return Snap Token agar langsung bisa dipakai untuk memunculkan popup
+        return response()->json([
+            'success' => true,
+            'snapToken' => $snapToken,
+            'order_id' => $order->id,
+        ]);
+
+    }
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -207,6 +336,8 @@ class CartController extends Controller
 
     public function __construct()
     {
+        $this->middleware('auth');
+
         Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = config('midtrans.is_sanitized');
@@ -215,50 +346,59 @@ class CartController extends Controller
 
     public function createSnapToken(Request $request)
     {
-        $user = auth()->user();
-        $cart = session()->get('cart', []);
-        $productIds = array_keys($cart);
+        try {
+            $order = Orders::with('user', 'order_detail.product')
+                ->where('user_id', auth()->id())
+                ->where('id', $request->order_id)
+                ->first();
+            if (!$order) {
+                return response()->json(['error' => 'Order tidak ditemukan'], 404);
+            }
 
-        $products = Products::whereIn('id', $productIds)->get()->keyBy('id');
+            $items = [];
+            foreach ($order->order_detail as $detail) {
+                $items[] = [
+                    'id' => $detail->product_id,
+                    'price' => $detail->price_at_order,
+                    'quantity' => $detail->quantity,
+                    'name' => Str::limit(preg_replace('/[^A-Za-z0-9 ]/', '', $detail->product->name), 50),
+                ];
+            }
 
-        $total = 0;
-        $items = [];
+            $address = $order->address_id ? \App\Models\user_addresses::find($order->address_id) : null;
 
-        foreach ($cart as $productId => $item) {
-            $product = $products[$productId];
-            $price = $item['price'];
-            $qty = $item['quantity'];
-            $subtotal = $price * $qty;
-            $total += $subtotal;
-
-            $items[] = [
-                'id' => $product->id,
-                'price' => $price,
-                'quantity' => $qty,
-                'name' => $product->name,
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $order->reference_number,
+                    'gross_amount' => max($order->total_price, 100),
+                ],
+                'item_details' => $items,
+                'customer_details' => [
+                    'first_name' => $order->user->name,
+                    'email' => $order->user->email,
+                    'shipping_address' => $address ? [
+                        'first_name'   => $address->name,
+                        'phone'        => $address->phone,
+                        'address'      => $address->address,
+                        'city'         => $address->city,
+                        'postal_code'  => $address->post_code,
+                        'country_code' => 'IDN',
+                    ] : [],
+                ],
             ];
+
+            $snapToken = Snap::getSnapToken($params);
+
+            return response()->json([
+                'snapToken' => $snapToken,
+                'order_id' => $order->id,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => true,
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        $orderId = 'ORDER-' . Str::uuid();
-
-        $params = [
-            'transaction_details' => [
-                'order_id' => $orderId,
-                'gross_amount' => $total,
-            ],
-            'customer_details' => [
-                'first_name' => $user->name,
-                'email' => $user->email,
-                'phone' => $user->phone_number,
-            ],
-            'item_details' => $items,
-        ];
-
-        $snapToken = Snap::getSnapToken($params);
-
-        return response()->json([
-            'snapToken' => $snapToken,
-            'order_id' => $orderId
-        ]);
     }
+
 }

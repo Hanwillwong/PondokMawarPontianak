@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class status extends Model
 {
     use HasFactory;
+
+    public function orders()
+    {
+        return $this->hasMany(orders::class);
+    }
 }

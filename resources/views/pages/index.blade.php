@@ -133,7 +133,7 @@
           <div class="swiper-slide">
           @if($category->sampleProduct && $category->sampleProduct->image)
             <div style="width: 124px; height: 124px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f0f0f0;">
-                <img src="{{ asset('uploads/products/' . $category->sampleProduct->image) }}" alt="" style="width: 100%; height: 100%; object-fit: cover;" />
+                <img src="{{ secure_asset('uploads/products/' . $category->sampleProduct->image) }}" alt="" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
           @else
             <p>No image available</p>

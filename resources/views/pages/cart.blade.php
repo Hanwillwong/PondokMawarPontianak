@@ -22,14 +22,14 @@
                     <em>Manage Your Items List</em>
                 </span>
             </a>
-            <a href="{{ route('checkout') }}" class="checkout-steps__item">
+            <a class="checkout-steps__item">
                 <span class="checkout-steps__item-number">02</span>
                 <span class="checkout-steps__item-title">
                     <span>Shipping and Checkout</span>
                     <em>Checkout Your Items List</em>
                 </span>
             </a>
-            <a href="javascript:void();" class="checkout-steps__item">
+            <a class="checkout-steps__item">
                 <span class="checkout-steps__item-number">03</span>
                 <span class="checkout-steps__item-title">
                     <span>Confirmation</span>
@@ -64,7 +64,7 @@
                         <tr>
                             <td>
                                 <div class="shopping-cart__product-item">
-                                    <img loading="lazy" src="{{ asset('uploads/products/' . $item['image']) }}" width="120" height="120" alt="" />
+                                    <img loading="lazy" src="{{ secure_asset('uploads/products/' . $item['image']) }}" width="120" height="120" alt="" />
                                 </div>
                             </td>
                             <td>

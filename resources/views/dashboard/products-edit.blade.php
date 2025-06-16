@@ -76,7 +76,7 @@
                         <div class="upload-image flex-grow">
                             @if($product->image)
                                 <div class="item" id="imgpreview">
-                                    <img src="{{ asset('uploads/products/' . $product->image) }}" class="effect8" alt="Product Image">
+                                    <img src="{{ secure_asset('uploads/products/' . $product->image) }}" class="effect8" alt="Product Image">
                                 </div>
                             @endif
                             <div id="upload-file" class="item up-load">

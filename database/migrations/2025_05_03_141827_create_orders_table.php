@@ -15,12 +15,15 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('user_id')->unsigned()->nullable();
             $table->bigInteger('status_id')->unsigned()->nullable();
+            $table->bigInteger('address_id')->unsigned()->nullable();
             $table->string('reference_number')->unique();
+            $table->string('snap_token')->nullable();
             $table->double('total_price')->nullable();
             $table->string('payment_method');
-            $table->enum('purchase', ['pickup', 'delivery']);
+            $table->enum('purchase_type', ['pickup', 'delivery']);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
+            $table->foreign('address_id')->references('id')->on('user_addresses')->onDelete('cascade');
             $table->timestamps();
         });
     }

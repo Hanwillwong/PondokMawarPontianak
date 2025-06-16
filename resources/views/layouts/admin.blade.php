@@ -8,17 +8,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/animate.min.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/animation.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-select.min.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/style.css') }}">
-  <link rel="stylesheet" href="{{ asset('font/fonts.css') }}">
-  <link rel="stylesheet" href="{{ asset('icon/style.css') }}">
-  <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
-  <link rel="apple-touch-icon-precomposed" href="{{ asset('images/favicon.ico') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/sweetalert.min.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/custom.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/animate.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/animation.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/bootstrap.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/bootstrap-select.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/style.css') }}">
+  <link rel="stylesheet" href="{{ secure_asset('font/fonts.css') }}">
+  <link rel="stylesheet" href="{{ secure_asset('icon/style.css') }}">
+  <link rel="shortcut icon" href="{{ secure_asset('images/favicon.ico') }}">
+  <link rel="apple-touch-icon-precomposed" href="{{ secure_asset('images/favicon.ico') }}">
+  <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/sweetalert.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/custom.css') }}">
 </head>
 <!-- [Head] end -->
 <!-- [Body] Start -->
@@ -44,12 +44,12 @@
 
 
 
-<script src="{{ asset('js/jquery.min.js') }}"></script>
-<script src="{{ asset('js/bootstrap.min.js') }}"></script>
-<script src="{{ asset('js/bootstrap-select.min.js') }}"></script>   
-<script src="{{ asset('js/sweetalert.min.js') }}"></script>    
-<script src="{{ asset('js/apexcharts/apexcharts.js') }}"></script>
-<script src="{{ asset('js/main.js') }}"></script>
+<script src="{{ secure_asset('js/jquery.min.js') }}"></script>
+<script src="{{ secure_asset('js/bootstrap.min.js') }}"></script>
+<script src="{{ secure_asset('js/bootstrap-select.min.js') }}"></script>   
+<script src="{{ secure_asset('js/sweetalert.min.js') }}"></script>    
+<script src="{{ secure_asset('js/apexcharts/apexcharts.js') }}"></script>
+<script src="{{ secure_asset('js/main.js') }}"></script>
 <script>
     (function ($) {
 

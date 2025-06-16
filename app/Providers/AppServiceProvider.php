@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+        if (request()->isSecure() || app()->environment('production')) {
+            URL::forceScheme('https');
+        }
+
+        if (env('APP_ENV') !== 'local') {
+            URL::forceScheme('https');
+        }
+
         Gate::define('admin', function(User $user){
             return $user->user_type === 'admin';
         });

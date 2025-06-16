@@ -38,7 +38,7 @@
                 <div class="header-text mb-4">
                      <h2>Login</h2>
                 </div>
-            <form id="loginForm" action="{{ url('/login') }}" method="post">
+            <form id="loginForm" action="{{ secure_url('/login') }}" method="post">
                 @csrf
                 <div class="input-group mb-3">
                     <input type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Email address" id="login" name="login" required>
@@ -63,7 +63,7 @@
                 </div>
             </form>
                 <div class="row">
-                    <small>Don't have account? <a href="{{ url('/register') }}">Register</a></small>
+                    <small>Don't have account? <a href="{{ secure_url('/register') }}">Register</a></small>
                 </div>
           </div>
        </div> 

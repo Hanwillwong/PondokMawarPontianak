@@ -34,7 +34,7 @@
                 @error("name") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
                 <fieldset class="name">
                     <div class="body-title">Brand Slug <span class="tf-color-1">*</span></div>
-                    <input class="flex-grow" type="text" placeholder="Brand Slug" name="slug" tabindex="0" value="{{old('slug')}}" aria-required="true">                                       
+                    <input class="flex-grow" type="text" placeholder="Brand Slug" name="slug" tabindex="0" value="{{old('slug')}}" aria-required="true" >                                       
                 </fieldset>
                 @error("slug") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
 

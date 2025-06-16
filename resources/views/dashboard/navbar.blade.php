@@ -210,7 +210,7 @@
                       id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
                       <span class="header-user wg-user">
                           <span class="image">
-                              <img src="{{ asset('images/avatar/user-1.png') }}" alt="">
+                              <img src="{{ secure_asset('images/avatar/user-1.png') }}" alt="">
                           </span>
                           <span class="flex flex-column">
                               <span class="body-title mb-2">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</span>

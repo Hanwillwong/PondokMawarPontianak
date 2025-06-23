@@ -19,7 +19,7 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        $products = Products::with(['brand', 'supplier', 'category'])->orderBy('id', 'asc')->paginate(10);
+        $products = products::with(['brand', 'supplier', 'category'])->orderBy('id', 'asc')->paginate(10);
         return view("dashboard.products",compact('products'));
     }
 
@@ -29,7 +29,7 @@ class ProductsController extends Controller
     public function create()
     {
         $categories = categories::Select('id','name')->orderBy('id')->get();
-        $brands = Brands::Select('id','name')->orderBy('id')->get();
+        $brands = brands::Select('id','name')->orderBy('id')->get();
         $suppliers = suppliers::Select('id','name')->orderBy('id')->get();
 
         return view("dashboard.products-add",compact('categories','brands','suppliers'));
@@ -107,7 +107,7 @@ class ProductsController extends Controller
      */
    public function show($id)
     {
-        $product = Products::with('product_price')->findOrFail($id);
+        $product = products::with('product_price')->findOrFail($id);
 
         $cart = session()->get('cart', []);
         $qtyInCart = isset($cart[$product->id]) ? $cart[$product->id]['quantity'] : 0;
@@ -122,7 +122,7 @@ class ProductsController extends Controller
     public function edit($id)
     {
         $categories = categories::all();
-        $brands = Brands::all();
+        $brands = brands::all();
         $suppliers = suppliers::all();
         $product = products::with('product_price')->findOrFail($id);
 

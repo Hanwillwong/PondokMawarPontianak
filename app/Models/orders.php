@@ -13,7 +13,7 @@ class orders extends Model
 
         public function status()
     {
-        return $this->belongsTo(Status::class, 'status_id');
+        return $this->belongsTo(status::class, 'status_id');
     }
 
     public function order_detail()

@@ -100,13 +100,18 @@
                                     </a>
                                     <ul class="sub-menu">
                                         <li class="sub-menu-item">
-                                            <a href="orders.html" class="">
-                                                <div class="text">Orders</div>
+                                            <a href="{{route('order.unprocessed')}}" class="">
+                                                <div class="text">Unprocessed Orders</div>
                                             </a>
                                         </li>
                                         <li class="sub-menu-item">
-                                            <a href="order-tracking.html" class="">
-                                                <div class="text">Order tracking</div>
+                                            <a href="{{route('order.ready')}}" class="">
+                                                <div class="text">Ready Orders</div>
+                                            </a>
+                                        </li>
+                                        <li class="sub-menu-item">
+                                            <a href="{{route('order.completed')}}" class="">
+                                                <div class="text">Completed Orders</div>
                                             </a>
                                         </li>
                                     </ul>

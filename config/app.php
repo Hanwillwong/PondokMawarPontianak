@@ -168,6 +168,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        NotificationChannels\WebPush\WebPushServiceProvider::class,
+        App\Providers\NotificationServiceProvider::class,
     ])->toArray(),
 
     /*

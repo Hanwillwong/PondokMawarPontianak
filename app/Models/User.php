@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 
+/**
+ * @method \NotificationChannels\WebPush\PushSubscription updatePushSubscription(string $endpoint, string|null $key = null, string|null $token = null, string|null $contentEncoding = null)
+ */
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+
+    use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions;
 
     /**
      * The attributes that are mass assignable.
@@ -54,4 +59,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(orders::class,'user_id');
     }
+
+    public function user_address()
+    {
+        return $this->hasMany(user_addresses::class, 'user_id');
+    }
+
 }

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->bigInteger('status_id')->unsigned()->nullable();
             $table->bigInteger('address_id')->unsigned()->nullable();
             $table->string('reference_number')->unique();
+            $table->string('snap_redirect_url')->nullable();
             $table->string('snap_token')->nullable();
             $table->double('total_price')->nullable();
             $table->string('payment_method');

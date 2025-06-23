@@ -144,7 +144,7 @@ class AccountController extends Controller
 
     public function orders()
     {
-        $orders = Orders::with('order_detail.product', 'status')
+        $orders = orders::with('order_detail.product', 'status')
             ->where('user_id', auth()->id())
             ->latest()
             ->get();

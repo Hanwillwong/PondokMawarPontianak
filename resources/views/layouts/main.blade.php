@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="user-logged-in" content="{{ auth()->check() ? 'true' : 'false' }}">
+  <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
+
   <link rel="icon" href="">
   <title></title>
     
@@ -25,7 +28,12 @@
     .logo__image {
       max-width: 220px;
     }
+    .suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
   </style>
+
+  @stack('styles')
 </head>
 <body>
 
@@ -271,8 +279,81 @@
   <script src="{{ secure_asset('assets/js/plugins/swiper.min.js') }}"></script>
   <script src="{{ secure_asset('assets/js/plugins/countdown.js') }}"></script>
   <script src="{{ secure_asset('assets/js/theme.js') }}"></script>
+
+  <script>
+    $(document).ready(function () {
+        function setupSearch(inputSelector, boxSelector) {
+            $(inputSelector).on('input', function () {
+                const query = $(this).val();
+                const suggestionBox = $(boxSelector);
+
+                if (query.length < 2) {
+                    suggestionBox.addClass('d-none').empty();
+                    return;
+                }
+
+                $.get('{{ route("ajax.search.suggestion") }}', { q: query }, function (data) {
+                    if (data.length === 0) {
+                        suggestionBox.addClass('d-none').empty();
+                        return;
+                    }
+
+                    suggestionBox.empty().removeClass('d-none');
+                    data.forEach(item => {
+                        suggestionBox.append(`<div class="px-2 py-1 suggestion-item" style="cursor:pointer;">${item.name}</div>`);
+                    });
+
+                    $('.suggestion-item').on('click', function () {
+                        $(inputSelector).val($(this).text());
+                        suggestionBox.addClass('d-none').empty();
+
+                        // Optional: submit form after click
+                        $(inputSelector).closest('form').submit();
+                    });
+                });
+            });
+        }
+
+        // Setup for both mobile and desktop
+        setupSearch('#search-input-mobile', '.suggestion-box-mobile');
+        setupSearch('#search-input-desktop', '.suggestion-box-desktop');
+    });
+    </script>
+
+
   @stack('scripts')
       
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then(function(registration) {
+          askPermission().then(() => {
+              subscribeUser(registration);
+          });
+      });
+  }
+
+  function askPermission() {
+      return Notification.requestPermission();
+  }
+
+  function subscribeUser(registration) {
+      registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(document.querySelector('meta[name="vapid-public-key"]').content)
+      }).then(function(subscription) {
+          axios.post('/save-subscription', subscription);
+      });
+  }
+
+  function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+      const rawData = atob(base64);
+      return new Uint8Array([...rawData].map(char => char.charCodeAt(0)));
+  }
+  </script>
 
 </body>
 </html>

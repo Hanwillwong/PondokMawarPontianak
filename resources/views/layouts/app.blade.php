@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="user-logged-in" content="{{ auth()->check() ? 'true' : 'false' }}">
+  <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
+
   <link rel="icon" href="">
   <title></title>
     
@@ -271,6 +274,39 @@
   <script src="{{ secure_asset('assets/js/plugins/countdown.js') }}"></script>
   <script src="{{ secure_asset('assets/js/theme.js') }}"></script>
       
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && document.querySelector('meta[name="user-logged-in"]').content === 'true') {
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+            askPermission().then(() => {
+                subscribeUser(registration);
+            });
+        });
+    }
+
+    function askPermission() {
+        return Notification.requestPermission();
+    }
+
+    function subscribeUser(registration) {
+        registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(document.querySelector('meta[name="vapid-public-key"]').content)
+        }).then(function(subscription) {
+            axios.post('/save-subscription', subscription)
+              .then(res => console.log('Subscribed:', res.data))
+              .catch(err => console.error('Subscription failed:', err));
+        });
+    }
+
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = atob(base64);
+        return new Uint8Array([...rawData].map(c => c.charCodeAt(0)));
+    }
+  </script>
 
 </body>
 </html>

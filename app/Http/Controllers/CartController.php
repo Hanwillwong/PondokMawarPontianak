@@ -30,7 +30,7 @@ class CartController extends Controller
         $productIds = array_keys($cart);
 
         // Ambil data produk dari database dengan relasi product_price
-        $products = Products::with('product_price')
+        $products = products::with('product_price')
             ->whereIn('id', $productIds)
             ->get()
             ->keyBy('id'); // Supaya mudah dicari berdasarkan ID
@@ -61,7 +61,7 @@ class CartController extends Controller
 
     public function add(Request $request)
     {
-        $product = Products::with('product_price')->findOrFail($request->id);
+        $product = products::with('product_price')->findOrFail($request->id);
         $quantity = $request->input('quantity', 1);
 
         $cart = session()->get('cart', []);
@@ -206,7 +206,7 @@ class CartController extends Controller
         // Simpan order
         $order = new \App\Models\orders();
         $order->user_id = $user->id;
-        $order->status_id = Status::where('label', $paymentMethod === 'midtrans' ? 'pending' : 'processing')->first()->id;
+        $order->status_id = status::where('label', $paymentMethod === 'midtrans' ? 'pending' : 'processing')->first()->id;
         $order->total_price = $total;
         $order->payment_method = $paymentMethod;
         $order->purchase_type = $purchase_type;
@@ -223,7 +223,7 @@ class CartController extends Controller
         // Buat item_details untuk Midtrans
         $items = [];
         foreach ($order->order_detail as $detail) {
-            $product = Products::find($detail['product_id']);
+            $product = products::find($detail['product_id']);
             $items[] = [
                 'id' => $detail['product_id'],
                 'price' => $detail['price_at_order'],
@@ -254,7 +254,11 @@ class CartController extends Controller
             ],
         ];
 
-        $snapToken = Snap::getSnapToken($params);
+        $snap = Snap::createTransaction($params);
+
+        $order->snap_token = $snap->token;
+        $order->snap_redirect_url = $snap->redirect_url; // Tambahkan kolom ini di tabel orders
+        $order->save();
 
         // ✅ Kosongkan cart (opsional)
         session()->forget('cart');
@@ -262,7 +266,8 @@ class CartController extends Controller
         // ✅ Return Snap Token agar langsung bisa dipakai untuk memunculkan popup
         return response()->json([
             'success' => true,
-            'snapToken' => $snapToken,
+            'snapToken' => $snap->token,
+            'redirect_url' => $snap->redirect_url,
             'order_id' => $order->id,
         ]);
 
@@ -294,7 +299,7 @@ class CartController extends Controller
 
         $productIds = array_keys($cart);
 
-        $products = Products::with('product_price')
+        $products = products::with('product_price')
             ->whereIn('id', $productIds)
             ->get()
             ->keyBy('id');
@@ -347,7 +352,7 @@ class CartController extends Controller
     public function createSnapToken(Request $request)
     {
         try {
-            $order = Orders::with('user', 'order_detail.product')
+            $order = orders::with('user', 'order_detail.product')
                 ->where('user_id', auth()->id())
                 ->where('id', $request->order_id)
                 ->first();

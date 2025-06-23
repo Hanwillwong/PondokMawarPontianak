@@ -13,11 +13,11 @@ class categories extends Model
 
     public function products()
     {
-        return $this->hasMany(Products::class);
+        return $this->hasMany(products::class);
     }
 
         public function sampleProduct()
     {
-        return $this->hasOne(Products::class, 'category_id');
+        return $this->hasOne(products::class, 'category_id');
     }
 }

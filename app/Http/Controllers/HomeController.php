@@ -13,8 +13,8 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $categories = Categories::with('sampleProduct')->get();
-        $products = Products::with(['brand', 'supplier', 'category'])->orderBy('id', 'asc')->paginate(10);
+        $categories = categories::with('sampleProduct')->get();
+        $products = products::with(['brand', 'supplier', 'category'])->orderBy('id', 'asc')->paginate(10);
         return view('pages.index',compact('products','categories'));
     }
 

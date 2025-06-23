@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AuthAdmin;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BrandsController;
@@ -20,6 +21,9 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\EcommerceController;
 use App\Http\Controllers\MidtransController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+use App\Models\User;
+use App\Notifications\NewOrderNotification;
+use Minishlink\WebPush\VAPID;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +53,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/account/address/{id}/edit', [AccountController::class, 'edit_address'])->name('pages.account-address.edit');
     Route::put('/account/address/{id}', [AccountController::class, 'update_address'])->name('pages.account-address.update');
 
+    Route::get('/account-orders', [AccountController::class, 'orders'])->name('account.orders');
+
     // Checkout & Midtrans
     Route::get('/checkout', [CartController::class, 'index_checkout'])->name('checkout');
     Route::post('/checkout/store', [CartController::class, 'store'])->name('checkout.store');
@@ -63,6 +69,8 @@ Route::middleware(['auth'])->group(function () {
     // Confirmation
     Route::get('/confirmation', [CartController::class, 'index_confirmation'])->name('order.confirmation');
 
+    Route::post('/midtrans/token/regenerate', [MidtransController::class, 'regenerateSnapToken'])->name('midtrans.token.regenerate');
+
 });
 
 // ==================== MIDTRANS NOTIFICATION (NO AUTH) ====================
@@ -71,8 +79,49 @@ Route::post('/midtrans/notification', [MidtransController::class, 'handleNotific
 
 // ==================== ADMIN ROUTES ====================
 Route::middleware([AuthAdmin::class])->group(function () {
+Route::get('/debug-vapid', function () {
+    dd(config('webpush.vapid'));
+});
+
+    Route::get('/check-key', function () {
+        $keys = VAPID::createVapidKeys();
+        dd($keys);
+    });
+
+    Route::get('/send-test-notification', function () {
+        $users = User::has('pushSubscriptions')->get();
+
+        foreach ($users as $user) {
+            $user->notify(new NewOrderNotification());
+        }
+
+        return 'Notifikasi terkirim!';
+    });
+
+    Route::post('/save-subscription', function (Request $request) {
+        $user = Auth::user(); // atau bisa dari middleware auth:api / sanctum jika pakai API
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $user->updatePushSubscription(
+            $request->input('endpoint'),
+            $request->input('keys.p256dh'),
+            $request->input('keys.auth'),
+            $request->input('contentEncoding', null) // optional
+        );
+
+        return response()->json(['message' => 'Subscription saved successfully.']);
+    });
+
     // Dashboard
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/completedorder', [AdminController::class, 'index_completed'])->name('order.completed');
+    Route::get('/readyorder', [AdminController::class, 'index_ready'])->name('order.ready');
+    Route::get('/unprocessedorder', [AdminController::class, 'index_unprocessed'])->name('order.unprocessed');
+    Route::get('/orders/{order}', [AdminController::class, 'show'])->name('admin.orders.show');
+    Route::post('/orders/{order}/update-status', [AdminController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
     // Brands
     Route::prefix('admin')->group(function () {
@@ -115,4 +164,11 @@ Route::get('/dashboard', [DashboardController::class, 'index']);
 Route::get('/product/{id}', [ProductsController::class, 'show'])->name('product.show');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::post('/midtrans/token', [CartController::class, 'createSnapToken'])->name('midtrans.token');
+
+Route::get('/shop/search', [ShopController::class, 'search'])->name('shop.search');
+
+Route::get('/ajax/search-suggestion', [ShopController::class, 'ajaxSearchSuggestion'])->name('ajax.search.suggestion');
+
+
+
 

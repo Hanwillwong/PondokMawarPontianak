@@ -35,7 +35,7 @@ class BrandsController extends Controller
             'name' => 'required',
             'slug' => 'required|unique:brands,slug',
        ]);
-       $brand = new Brands();
+       $brand = new brands();
        $brand->name = $request->name;
        $brand->slug = Str::slug($request->name);
        $brand->save();
@@ -55,7 +55,7 @@ class BrandsController extends Controller
      */
     public function edit($id)
     {
-        $brand = Brands::find($id);
+        $brand = brands::find($id);
         return view('dashboard.brand-edit',compact('brand'));
     }
 
@@ -68,7 +68,7 @@ class BrandsController extends Controller
             'name' => 'required',
             'slug' => 'required|unique:brands,slug,'.$request->id,
         ]);
-        $brand = Brands::find($request->id);
+        $brand = brands::find($request->id);
         $brand->name = $request->name;
         $brand->slug = $request->slug;     
         $brand->save();        
@@ -80,7 +80,7 @@ class BrandsController extends Controller
      */
     public function destroy($id)
     {
-        $brand = Brands::find($id);
+        $brand = brands::find($id);
         $brand->delete();
         return redirect()->route('admin.brands')->with('status','Record has been deleted successfully !');
 

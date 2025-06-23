@@ -1,0 +1,17 @@
+{
+    "name": "Pondok Mawar",
+    "short_name": "PM",
+    "start_url": "https://wired-jaybird-secretly.ngrok-free.app/admin",
+    "background_color": "#6777ef",
+    "description": "Aplikasi Pondok Mawar",
+    "display": "fullscreen",
+    "theme_color": "#6777ef",
+    "icons": [
+        {
+            "src": "logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

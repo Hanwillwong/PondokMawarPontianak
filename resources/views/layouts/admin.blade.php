@@ -10,6 +10,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="user-logged-in" content="{{ auth()->check() ? 'true' : 'false' }}">
   <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
+  
+  <!-- PWA  -->
+<meta name="theme-color" content="#6777ef"/>
+<link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
+<link rel="manifest" href="{{ asset('/manifest.json') }}">
 
   <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/animate.min.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/animation.css') }}">
@@ -48,12 +53,12 @@
 
 
 
-<script src="{{ secure_asset('js/jquery.min.js') }}"></script>
-<script src="{{ secure_asset('js/bootstrap.min.js') }}"></script>
-<script src="{{ secure_asset('js/bootstrap-select.min.js') }}"></script>   
-<script src="{{ secure_asset('js/sweetalert.min.js') }}"></script>    
-<script src="{{ secure_asset('js/apexcharts/apexcharts.js') }}"></script>
-<script src="{{ secure_asset('js/main.js') }}"></script>
+<script src="{{ secure_asset('js/jquery.min.js') }}" defer></script>
+<script src="{{ secure_asset('js/bootstrap.min.js') }}" defer></script>
+<script src="{{ secure_asset('js/bootstrap-select.min.js') }}" defer></script>   
+<script src="{{ secure_asset('js/sweetalert.min.js') }}" defer></script>    
+<script src="{{ secure_asset('js/apexcharts/apexcharts.js') }}" defer></script>
+<script src="{{ secure_asset('js/main.js') }}" defer></script>
 <script>
     (function ($) {
 
@@ -153,37 +158,68 @@
     })(jQuery);
 </script>
 @stack('scripts')
+<script>
+    // Register service worker
+    navigator.serviceWorker.register('/service-worker.js').then(registration => {
+        console.log('Service Worker registered:', registration);
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script>
-  if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').then(function(registration) {
-          askPermission().then(() => {
-              subscribeUser(registration);
-          });
-      });
-  }
+        // Minta izin
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                // Lanjut ke subscription
+                registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array("{{ env('VAPID_PUBLIC_KEY') }}")
+                }).then(sub => {
+                    console.log("Subscription berhasil:", sub); // <--- LETAKKAN DI SINI
 
-  function askPermission() {
-      return Notification.requestPermission();
-  }
+                    // Kirim ke server
+                    fetch("{{ url('/admin/save-subscription') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({ sub: JSON.stringify(sub) })
+                    }).then(res => res.json())
+                      .then(data => {
+                          console.log("Subscription saved:", data);
+                      });
+                }).catch(err => {
+                    console.error("Subscription gagal:", err);
+                });
+            }
+        });
+    });
 
-  function subscribeUser(registration) {
-      registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(document.querySelector('meta[name="vapid-public-key"]').content)
-      }).then(function(subscription) {
-          axios.post('/save-subscription', subscription);
-      });
-  }
+    // Konversi VAPID public key
+    function urlBase64ToUint8Array(base64String) {
+        const padding = "=".repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
+        const rawData = atob(base64);
+        return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+    }
+</script>
 
-  function urlBase64ToUint8Array(base64String) {
-      const padding = '='.repeat((4 - base64String.length % 4) % 4);
-      const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-      const rawData = atob(base64);
-      return new Uint8Array([...rawData].map(char => char.charCodeAt(0)));
-  }
-  </script>
+<script src="{{ secure_asset('/sw.js') }}" defer></script>
+<script>
+if ("serviceWorker" in navigator) {
+    // Register a service worker hosted at the root of the
+    // site using the default scope.
+    navigator.serviceWorker.register("/sw.js").then(
+    (registration) => {
+        console.log("Service worker registration succeeded:", registration);
+    },
+    (error) => {
+        console.error(`Service worker registration failed: ${error}`);
+    },
+    );
+} else {
+    console.error("Service workers are not supported.");
+}
+</script>
+
+
 </body>
 <!-- [Body] end -->
 

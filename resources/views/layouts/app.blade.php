@@ -7,6 +7,11 @@
   <meta name="user-logged-in" content="{{ auth()->check() ? 'true' : 'false' }}">
   <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
 
+  <!-- PWA  -->
+<meta name="theme-color" content="#6777ef"/>
+<link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
+<link rel="manifest" href="{{ asset('/manifest.json') }}">
+
   <link rel="icon" href="">
   <title></title>
     
@@ -267,46 +272,30 @@
   <div id="scrollTop" class="visually-hidden end-0"></div>
   <div class="page-overlay"></div>
 
-  <script src="{{ secure_asset('assets/js/plugins/jquery.min.js') }}"></script>
-  <script src="{{ secure_asset('assets/js/plugins/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ secure_asset('assets/js/plugins/bootstrap-slider.min.js') }}"></script>
-  <script src="{{ secure_asset('assets/js/plugins/swiper.min.js') }}"></script>
-  <script src="{{ secure_asset('assets/js/plugins/countdown.js') }}"></script>
-  <script src="{{ secure_asset('assets/js/theme.js') }}"></script>
-      
+  <script src="{{ secure_asset('assets/js/plugins/jquery.min.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/plugins/bootstrap.bundle.min.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/plugins/bootstrap-slider.min.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/plugins/swiper.min.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/plugins/countdown.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/theme.js') }}" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="{{ secure_asset('/sw.js') }}" defer></script>
   <script>
-    if ('serviceWorker' in navigator && document.querySelector('meta[name="user-logged-in"]').content === 'true') {
-        navigator.serviceWorker.register('/sw.js').then(function(registration) {
-            askPermission().then(() => {
-                subscribeUser(registration);
-            });
-        });
-    }
-
-    function askPermission() {
-        return Notification.requestPermission();
-    }
-
-    function subscribeUser(registration) {
-        registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(document.querySelector('meta[name="vapid-public-key"]').content)
-        }).then(function(subscription) {
-            axios.post('/save-subscription', subscription)
-              .then(res => console.log('Subscribed:', res.data))
-              .catch(err => console.error('Subscription failed:', err));
-        });
-    }
-
-    function urlBase64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-        const rawData = atob(base64);
-        return new Uint8Array([...rawData].map(c => c.charCodeAt(0)));
+    if ("serviceWorker" in navigator) {
+        // Register a service worker hosted at the root of the
+        // site using the default scope.
+        navigator.serviceWorker.register("/sw.js").then(
+        (registration) => {
+          console.log("Service worker registration succeeded:", registration);
+        },
+        (error) => {
+          console.error(`Service worker registration failed: ${error}`);
+        },
+      );
+    } else {
+      console.error("Service workers are not supported.");
     }
   </script>
-
+  
 </body>
 </html>

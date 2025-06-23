@@ -14,6 +14,9 @@ use App\Models\categories;
 use Midtrans\Snap;
 use Midtrans\Config;
 use Exception;
+use App\Models\PushSubscription;
+use Minishlink\WebPush\WebPush;
+use Minishlink\WebPush\Subscription;
 
 
 class CartController extends Controller
@@ -261,7 +264,31 @@ class CartController extends Controller
         $order->save();
 
         // ✅ Kosongkan cart (opsional)
-        session()->forget('cart');
+        // session()->forget('cart');
+
+
+        $auth = [
+            'VAPID' => [
+                'subject' => env('VAPID_SUBJECT'),
+                'publicKey' => env('VAPID_PUBLIC_KEY'),
+                'privateKey' => env('VAPID_PRIVATE_KEY'),
+            ]
+        ];
+
+        $webPush = new WebPush($auth);
+
+        $payload = json_encode([
+            'title' => 'Order Baru Masuk',
+            'body' => 'Ada pesanan baru dari ' . $user->name,
+            'url' => url('/admin') // URL admin ke halaman orders
+        ]);
+
+        foreach (PushSubscription::all() as $sub) {
+            $webPush->sendOneNotification(
+                Subscription::create($sub->subscription),
+                $payload
+            );
+        }
 
         // ✅ Return Snap Token agar langsung bisa dipakai untuk memunculkan popup
         return response()->json([

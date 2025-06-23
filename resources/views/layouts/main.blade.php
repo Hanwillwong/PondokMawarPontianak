@@ -272,13 +272,13 @@
   <div id="scrollTop" class="visually-hidden end-0"></div>
   <div class="page-overlay"></div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="{{ secure_asset('assets/js/plugins/jquery.min.js') }}"></script>
-  <script src="{{ secure_asset('assets/js/plugins/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ secure_asset('assets/js/plugins/bootstrap-slider.min.js') }}"></script>
-  <script src="{{ secure_asset('assets/js/plugins/swiper.min.js') }}"></script>
-  <script src="{{ secure_asset('assets/js/plugins/countdown.js') }}"></script>
-  <script src="{{ secure_asset('assets/js/theme.js') }}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+  <script src="{{ secure_asset('assets/js/plugins/jquery.min.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/plugins/bootstrap.bundle.min.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/plugins/bootstrap-slider.min.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/plugins/swiper.min.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/plugins/countdown.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/theme.js') }}" defer></script>
 
   <script>
     $(document).ready(function () {
@@ -323,37 +323,5 @@
 
   @stack('scripts')
       
-
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script>
-  if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').then(function(registration) {
-          askPermission().then(() => {
-              subscribeUser(registration);
-          });
-      });
-  }
-
-  function askPermission() {
-      return Notification.requestPermission();
-  }
-
-  function subscribeUser(registration) {
-      registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(document.querySelector('meta[name="vapid-public-key"]').content)
-      }).then(function(subscription) {
-          axios.post('/save-subscription', subscription);
-      });
-  }
-
-  function urlBase64ToUint8Array(base64String) {
-      const padding = '='.repeat((4 - base64String.length % 4) % 4);
-      const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-      const rawData = atob(base64);
-      return new Uint8Array([...rawData].map(char => char.charCodeAt(0)));
-  }
-  </script>
-
 </body>
 </html>

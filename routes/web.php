@@ -21,9 +21,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\EcommerceController;
 use App\Http\Controllers\MidtransController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
-use App\Models\User;
-use App\Notifications\NewOrderNotification;
-use Minishlink\WebPush\VAPID;
+use App\Http\Controllers\PushNotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,42 +77,9 @@ Route::post('/midtrans/notification', [MidtransController::class, 'handleNotific
 
 // ==================== ADMIN ROUTES ====================
 Route::middleware([AuthAdmin::class])->group(function () {
-Route::get('/debug-vapid', function () {
-    dd(config('webpush.vapid'));
-});
-
-    Route::get('/check-key', function () {
-        $keys = VAPID::createVapidKeys();
-        dd($keys);
-    });
-
-    Route::get('/send-test-notification', function () {
-        $users = User::has('pushSubscriptions')->get();
-
-        foreach ($users as $user) {
-            $user->notify(new NewOrderNotification());
-        }
-
-        return 'Notifikasi terkirim!';
-    });
-
-    Route::post('/save-subscription', function (Request $request) {
-        $user = Auth::user(); // atau bisa dari middleware auth:api / sanctum jika pakai API
-
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        $user->updatePushSubscription(
-            $request->input('endpoint'),
-            $request->input('keys.p256dh'),
-            $request->input('keys.auth'),
-            $request->input('contentEncoding', null) // optional
-        );
-
-        return response()->json(['message' => 'Subscription saved successfully.']);
-    });
-
+    
+    Route::post('/admin/save-subscription', [PushNotificationController::class, 'saveSubscription']);
+    
     // Dashboard
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
     Route::get('/completedorder', [AdminController::class, 'index_completed'])->name('order.completed');

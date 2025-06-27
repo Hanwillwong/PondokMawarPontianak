@@ -33,12 +33,7 @@
                     <div class="body-title">Suppliers Name <span class="tf-color-1">*</span></div>
                     <input class="flex-grow" type="text" placeholder="Category name" name="name" tabindex="0" value="{{$supplier->name}}" aria-required="true" required="">
                 </fieldset>
-                @error("name") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
-                <fieldset class="name">
-                    <div class="body-title">Suppliers Slug <span class="tf-color-1">*</span></div>
-                    <input class="flex-grow" type="text" placeholder="Category Slug" name="slug" tabindex="0" value="{{$supplier->slug}}" aria-required="true" required="">
-                </fieldset>
-                @error("slug") <span class="alert alert-danger text-center">{{$message}}</span> @enderror            
+                @error("name") <span class="alert alert-danger text-center">{{$message}}</span> @enderror        
                 <fieldset class="phone_number">
                     <div class="body-title">Suppliers Phone Number <span class="tf-color-1">*</span></div>
                     <input class="flex-grow" type="text" placeholder="Phone Number" name="phone_number" tabindex="0" value="{{$supplier->phone_number}}" aria-required="true" required="">
@@ -61,18 +56,3 @@
 </div>                    
 </div>
 @endsection
-
-@push("scripts")
-<script>
-        $(function () {
-            $("input[name='name']").on("input", function () {
-                $("input[name='slug']").val(StringToSlug($(this).val()));
-            });
-        });
-        function StringToSlug(Text) {
-            return Text.toLowerCase()
-                .replace(/[^\w ]+/g, "")
-                .replace(/ +/g, "-");
-        }
-    </script>
-@endpush

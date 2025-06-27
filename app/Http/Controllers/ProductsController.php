@@ -46,10 +46,8 @@ class ProductsController extends Controller
         //  Validasi input dari form
         $request->validate([
             'name' => 'required',
-            'slug' => 'required|unique:products,slug',
             'category_id' => 'required',
             'brand_id' => 'required',
-            'supplier_id' => 'required',
             'description' => 'required',
             'quantity' => 'required|numeric|min:0',
             'image' => 'required|mimes:png,jpg,jpeg|max:2048', // Validasi gambar
@@ -61,12 +59,10 @@ class ProductsController extends Controller
         // Membuat objek produk baru
         $product = new products();
         $product->name = $request->name;
-        $product->slug = Str::slug($request->name);
         $product->description = $request->description;
         $product->quantity = $request->quantity;
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
-        $product->supplier_id = $request->supplier_id;
 
         // Memeriksa apakah ada gambar yang diupload
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
@@ -143,10 +139,8 @@ class ProductsController extends Controller
         // dd($request->all(), $product->id);
         $request->validate([
             'name' => 'required',
-            'slug' => 'required|unique:products,slug,' . $product->id, // Ensure we exclude current product from slug uniqueness check
             'category_id' => 'required',
             'brand_id' => 'required',
-            'supplier_id' => 'required',
             'description' => 'required',
             'quantity' => 'required|numeric|min:0',
             'image' => 'nullable|mimes:png,jpg,jpeg|max:2048',
@@ -157,12 +151,10 @@ class ProductsController extends Controller
 
         // Update product details
         $product->name = $request->name;
-        $product->slug = $request->slug;
         $product->description = $request->description;
         $product->quantity = $request->quantity;
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
-        $product->supplier_id = $request->supplier_id;
 
         // Handle image upload
         if ($request->hasFile('image') && $request->file('image')->isValid()) {

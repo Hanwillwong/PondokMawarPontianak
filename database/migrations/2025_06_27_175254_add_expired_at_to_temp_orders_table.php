@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dashboards', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('temp_orders', function (Blueprint $table) { 
+            $table->timestamp('expired_at')->nullable()->after('address_id');
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dashboards');
+        Schema::table('temp_orders', function (Blueprint $table) {
+            $table->dropColumn('expired_at');
+        });
     }
 };

@@ -34,7 +34,7 @@
                                         </li>
                                         <li class="sub-menu-item">
                                             <a href="{{route('admin.products')}}" class="">
-                                                <div class="text">Products</div>
+                                                <div class="text">List Products</div>
                                             </a>
                                         </li>
                                     </ul>
@@ -52,7 +52,7 @@
                                         </li>
                                         <li class="sub-menu-item">
                                             <a href="{{route('admin.brands')}}" class="">
-                                                <div class="text">Brands</div>
+                                                <div class="text">List Brands</div>
                                             </a>
                                         </li>
                                     </ul>
@@ -70,7 +70,7 @@
                                         </li>
                                         <li class="sub-menu-item">
                                             <a href="{{route('admin.categories')}}" class="">
-                                                <div class="text">Categories</div>
+                                                <div class="text">List Categories</div>
                                             </a>
                                         </li>
                                     </ul>
@@ -88,7 +88,7 @@
                                         </li>
                                         <li class="sub-menu-item">
                                             <a href="{{route('admin.suppliers')}}" class="">
-                                                <div class="text">Suppliers</div>
+                                                <div class="text">List Suppliers</div>
                                             </a>
                                         </li>
                                     </ul>
@@ -116,18 +116,35 @@
                                         </li>
                                     </ul>
                                 </li>
+
+                                <li class="menu-item has-children">
+                                    <a href="javascript:void(0);" class="menu-item-button">
+                                        <div class="icon"><i class="icon-grid"></i></div>
+                                        <div class="text">Stock In</div>
+                                    </a>
+                                    <ul class="sub-menu">
+                                        <li class="sub-menu-item">
+                                            <a href="{{route('admin.stockin.add')}}" class="">
+                                                <div class="text">New Stock In</div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <ul class="sub-menu">
+                                        <li class="sub-menu-item">
+                                            <a href="{{route('admin.stockin')}}" class="">
+                                                <div class="text">List Stock In</div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
                                 <li class="menu-item">
                                     <a href="slider.html" class="">
                                         <div class="icon"><i class="icon-image"></i></div>
                                         <div class="text">Slider</div>
                                     </a>
                                 </li>
-                                <li class="menu-item">
-                                    <a href="coupons.html" class="">
-                                        <div class="icon"><i class="icon-grid"></i></div>
-                                        <div class="text">Coupns</div>
-                                    </a>
-                                </li>
+                                
 
                                 <li class="menu-item">
                                     <a href="users.html" class="">

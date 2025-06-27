@@ -24,8 +24,9 @@
                     <div class="col-md-6">
                         <div class="bg-white p-3 rounded shadow-sm h-100">
                             <h6 class="text-muted mb-2">Customer Info</h6>
-                            <p class="mb-1"><strong>Name:</strong> {{ $order->user->name ?? '-' }}</p>
-                            <p class="mb-1"><strong>Phone:</strong> 0{{ $order->user->user_address->first()->phone ?? '-' }}</p>
+                            @php $addr = $order->address; @endphp
+                            <p class="mb-1"><strong>Name:</strong> {{ $addr->name ?? '-' }}</p>
+                            <p class="mb-1"><strong>Phone:</strong> 0{{ $addr->phone ?? '-' }}</p>
                             <p class="mb-0"><strong>Type:</strong> {{ ucfirst($order->purchase_type) }}</p>
                         </div>
                     </div>

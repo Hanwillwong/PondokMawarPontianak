@@ -32,13 +32,8 @@
                     <input class="flex-grow" type="text" placeholder="Category name" name="name" tabindex="0" value="{{old('name')}}" aria-required="true">                    
                 </fieldset>
                 @error("name") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
-                <fieldset class="name">
-                    <div class="body-title">Category Slug <span class="tf-color-1">*</span></div>
-                    <input class="flex-grow" type="text" placeholder="Category Slug" name="slug" tabindex="0" value="{{old('slug')}}" aria-required="true">                                       
-                </fieldset>
-                @error("slug") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
 
-                <div class="bot">
+                <div class="bot">   
                     <div></div>
                     <button class="tf-button w208" type="submit">Save</button>
                 </div>
@@ -50,18 +45,3 @@
 </div>                    
 </div>
 @endsection
-
-@push("scripts")
-    <script>
-        $(function(){
-            $("input[name='name']").on("input", function(){
-                $("input[name='slug']").val(StringToSlug($(this).val()));
-            });
-        });
-        function StringToSlug(Text) {
-            return Text.toLowerCase()
-            .replace(/[^\w ]+/g, "")
-            .replace(/ +/g, "-");
-        }      
-    </script>
-@endpush

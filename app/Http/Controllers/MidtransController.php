@@ -14,51 +14,217 @@ use Midtrans\Snap;
 
 class MidtransController extends Controller
 {
+    // public function handleNotification(Request $request)
+    // {
+    //     Log::info('Webhook DITERIMA', [
+    //         'raw' => file_get_contents('php://input'),
+    //         'parsed' => $request->all(),
+    //     ]);
+
+    //     Config::$serverKey = config('midtrans.server_key');
+    //     Config::$isProduction = config('midtrans.is_production');
+    //     Config::$isSanitized = config('midtrans.is_sanitized');
+    //     Config::$is3ds = config('midtrans.is_3ds');
+
+    //     try {
+    //         $notif = new Notification();
+    //         Log::info('Notification dari Midtrans', [
+    //             'transaction_status' => $notif->transaction_status,
+    //             'order_id' => $notif->order_id,
+    //         ]);
+
+    //         $transaction = $notif->transaction_status;
+    //         $orderId = $notif->order_id;
+
+    //         $order = orders::where('reference_number', $orderId)->first();
+
+    //         // 👉 Tambahkan di sini:
+    //         if (!$order) {
+    //             Log::warning('Order tidak ditemukan dari order_id Midtrans', ['order_id' => $orderId]);
+    //             return response()->json(['error' => 'Order tidak ditemukan'], 404);
+    //         }
+
+    //         // Proses status pembayaran
+    //         if ($transaction === 'capture' || $transaction === 'settlement') {
+    //             $order->status_id = status::where('label', 'paid')->first()->id;
+    //         } elseif ($transaction === 'pending') {
+    //             $order->status_id = status::where('label', 'pending')->first()->id;
+    //         } elseif (in_array($transaction, ['deny', 'cancel', 'expire'])) {
+    //             $order->status_id = status::where('label', 'failed')->first()->id;
+    //         }
+
+    //         $order->save();
+
+    //         return response()->json(['success' => true]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Midtrans Notification Error: ' . $e->getMessage());
+    //         return response()->json(['error' => 'Internal Server Error'], 500);
+    //     }
+    // }
+
     public function handleNotification(Request $request)
     {
-        Log::info('Webhook DITERIMA', [
-            'raw' => file_get_contents('php://input'),
-            'parsed' => $request->all(),
-        ]);
-
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = config('midtrans.is_production');
-        Config::$isSanitized = config('midtrans.is_sanitized');
-        Config::$is3ds = config('midtrans.is_3ds');
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production');
+        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
 
         try {
-            $notif = new Notification();
-            Log::info('Notification dari Midtrans', [
-                'transaction_status' => $notif->transaction_status,
-                'order_id' => $notif->order_id,
-            ]);
-
+            $notif = new \Midtrans\Notification();
             $transaction = $notif->transaction_status;
             $orderId = $notif->order_id;
 
-            $order = orders::where('reference_number', $orderId)->first();
+            $existingOrder = \App\Models\orders::where('reference_number', $orderId)->first();
 
-            // 👉 Tambahkan di sini:
-            if (!$order) {
-                Log::warning('Order tidak ditemukan dari order_id Midtrans', ['order_id' => $orderId]);
-                return response()->json(['error' => 'Order tidak ditemukan'], 404);
+            $existingOrder = \App\Models\orders::where('reference_number', $orderId)->first();
+
+            if ($existingOrder) {
+                $newStatus = null;
+
+                if ($transaction === 'capture') {
+                    $newStatus = $notif->fraud_status === 'challenge' ? 'pending' : 'paid';
+                } elseif ($transaction === 'settlement') {
+                    $newStatus = 'paid';
+                } elseif ($transaction === 'pending') {
+                    $newStatus = 'pending';
+                } elseif (in_array($transaction, ['deny', 'cancel', 'expire'])) {
+                    $newStatus = 'failed';
+                }
+
+                if ($newStatus) {
+                    $statusId = \App\Models\status::where('label', $newStatus)->value('id');
+
+                    if ($statusId && $existingOrder->status_id !== $statusId) {
+                        $existingOrder->status_id = $statusId;
+                        $existingOrder->save();
+
+                        Log::info("Order #{$orderId} status updated to {$newStatus}");
+                    }
+                }
+
+                return response()->json(['message' => 'Order status updated']);
             }
 
-            // Proses status pembayaran
+            $temp = null;
+            $retry = 0;
+            while (!$temp && $retry < 5) {
+                $temp = \App\Models\temp_orders::where('reference_number', $orderId)->first();
+                if (!$temp) {
+                    usleep(200000); // tunggu 200ms
+                    $retry++;
+                }
+            }
+
+            if (!$temp) {
+                Log::warning('Temp order not found setelah 5x retry', ['order_id' => $orderId]);
+                return response()->json(['error' => 'Temp order not found'], 404);
+            }
+
+            if (!$temp) {
+                Log::warning('Temp order not found', ['order_id' => $orderId]);
+                return response()->json(['error' => 'Temp order not found'], 404);
+            }
+
+            $user = \App\Models\User::find($temp->user_id);
+            if (!$user) {
+                return response()->json(['error' => 'User not found'], 404);
+            }
+
+            $cart = json_decode($temp->cart, true);
+            $total = 0;
+            $orderDetails = [];
+
+            $productIds = array_keys($cart);
+            $products = \App\Models\products::with('product_price')->whereIn('id', $productIds)->get()->keyBy('id');
+
+            foreach ($cart as $productId => $item) {
+                $product = $products[$productId] ?? null;
+                if (!$product) continue;
+
+                $quantity = $item['quantity'];
+
+                // ✅ CEK STOK
+                if ($product->quantity < $quantity) {
+                    Log::warning("Stok tidak cukup untuk produk {$product->name}");
+                    return response()->json(['error' => 'Stok tidak cukup untuk produk: '.$product->name], 400);
+                }
+
+                $price = $product->price;
+
+                foreach ($product->product_price as $tier) {
+                    if ($quantity >= $tier->min_quantity) {
+                        $price = $tier->price;
+                    }
+                }
+
+                $subtotal = $price * $quantity;
+                $total += $subtotal;
+
+                $orderDetails[] = [
+                    'product_id' => $product->id,
+                    'price_at_order' => $price,
+                    'quantity' => $quantity,
+                    'subtotal' => $subtotal,
+                ];
+            }
+
+            $order = new \App\Models\orders();
+            $order->user_id = $user->id;
+            $order->reference_number = $orderId;
+
+            $status = 'pending'; // default
+
             if ($transaction === 'capture' || $transaction === 'settlement') {
-                $order->status_id = status::where('label', 'paid')->first()->id;
+                $status = 'paid';
             } elseif ($transaction === 'pending') {
-                $order->status_id = status::where('label', 'pending')->first()->id;
+                $status = 'pending';
             } elseif (in_array($transaction, ['deny', 'cancel', 'expire'])) {
-                $order->status_id = status::where('label', 'failed')->first()->id;
+                $status = 'failed';
             }
 
+            $order->status_id = \App\Models\status::where('label', $status)->first()->id;
+
+            $order->total_price = $total;
+            $order->payment_method = $temp->payment_method;
+            $order->purchase_type = $temp->purchase_type;
+            $order->address_id = $temp->purchase_type === 'delivery' ? $temp->address_id : null;
             $order->save();
 
-            return response()->json(['success' => true]);
+            foreach ($orderDetails as $detail) {
+                $detail['order_id'] = $order->id;
+                \App\Models\order_details::create($detail);
+            }
+
+            $auth = [
+                'VAPID' => [
+                    'subject' => env('VAPID_SUBJECT'),
+                    'publicKey' => env('VAPID_PUBLIC_KEY'),
+                    'privateKey' => env('VAPID_PRIVATE_KEY'),
+                ]
+            ];
+
+            $webPush = new \Minishlink\WebPush\WebPush($auth);
+            $payload = json_encode([
+                'title' => 'Order Baru Masuk',
+                'body' => 'Ada pesanan baru dari ' . $user->name,
+                'url' => url('/admin'),
+                'requireInteraction'=> true
+            ]);
+
+            foreach (\App\Models\PushSubscription::all() as $sub) {
+                $webPush->sendOneNotification(
+                    \Minishlink\WebPush\Subscription::create($sub->subscription),
+                    $payload
+                );
+            }
+
+            // Hapus dari temp_orders
+            $temp->delete();
+
+            return response()->json(['message' => 'Order berhasil disimpan']);
         } catch (\Exception $e) {
             Log::error('Midtrans Notification Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Internal Server Error'], 500);
+            return response()->json(['error' => 'Internal server error'], 500);
         }
     }
 

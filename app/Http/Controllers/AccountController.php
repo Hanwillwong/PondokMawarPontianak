@@ -7,6 +7,8 @@ use App\Models\user_addresses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\orders;
+use Midtrans\Transaction;
+use Illuminate\Support\Facades\Log;
 
 class AccountController extends Controller
 {
@@ -151,4 +153,33 @@ class AccountController extends Controller
 
         return view('pages.account-orders', compact('orders'));
     }
+
+    public function orders_details($id)
+    {
+        $order = orders::with('order_detail.product', 'status', 'address')
+            ->where('user_id', auth()->id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $midtrans = null;
+
+        $expiredTime = $order->created_at->addHour();
+
+        if ($order->payment_method === 'midtrans') {
+            try {
+                \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+                \Midtrans\Config::$isProduction = false;
+                \Midtrans\Config::$isSanitized = true;
+                \Midtrans\Config::$is3ds = true;
+
+                $midtrans = \Midtrans\Transaction::status($order->reference_number);
+            } catch (\Exception $e) {
+                Log::error('Midtrans error: ' . $e->getMessage());
+                $midtrans = null;
+            }
+        }
+
+        return view('pages.account-order-details', compact('order', 'midtrans','expiredTime'));
+    }
+
 }

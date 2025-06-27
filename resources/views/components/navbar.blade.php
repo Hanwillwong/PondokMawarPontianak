@@ -173,10 +173,6 @@
           <div class="header-tools__item hover-container">
             <div class="js-hover__open position-relative">
               <a class="js-search-popup search-field__actor" href="#">
-                <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <use href="#icon_search" />
-                </svg>
                 <i class="btn-icon btn-close-lg"></i>
               </a>
             </div>
@@ -185,8 +181,7 @@
               <form action="{{ route('shop.search') }}" method="GET" class="search-field container">
                 <p class="text-uppercase text-secondary fw-medium mb-4">What are you looking for?</p>
                 <div class="position-relative">
-                  <input id="search-input-desktop" class="search-field__input search-popup__input w-100 fw-medium"
-       type="text" name="search-keyword" placeholder="Search products" autocomplete="off" />
+                  <input id="search-input-desktop" class="search-field__input search-popup__input w-100 fw-medium" type="text" name="q" placeholder="Search products" autocomplete="off" />
                   <button class="btn-icon search-popup__submit" type="submit">
                     <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
                       xmlns="http://www.w3.org/2000/svg">
@@ -235,15 +230,7 @@
                 </svg>
               </a>
             </div>
-          @endif
-
-          <a href="wishlist.html" class="header-tools__item">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <use href="#icon_heart" />
-            </svg>
-          </a>
-
-          
+          @endif     
 
           <a href="{{route('cart')}}" class="header-tools__item header-tools__cart">
             <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"

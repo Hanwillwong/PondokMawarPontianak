@@ -19,24 +19,6 @@
                         <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
                     </fieldset>
                     @error("name") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
-                    <fieldset class="name">
-                        <div class="body-title mb-10">Slug <span class="tf-color-1">*</span></div>
-                        <input class="mb-10" type="text" placeholder="Enter product slug" name="slug" tabindex="0" value="{{ old('slug', $product->slug) }}" aria-required="true">
-                        <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
-                    </fieldset>
-                    @error("slug") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
-                    <fieldset class="supplier">
-                        <div class="body-title mb-10">Supplier <span class="tf-color-1">*</span></div>
-                        <div class="select">
-                            <select class="" name="supplier_id">
-                                <option value="">Choose Supplier</option>
-                                @foreach ($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}" {{ $supplier->id == $product->supplier_id ? 'selected' : '' }}>{{ $supplier->name }}</option>
-                                @endforeach                                                                 
-                            </select>
-                        </div>
-                    </fieldset>
-                    @error("supplier_id") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
                     <div class="gap22 cols">
                         <fieldset class="category">
                             <div class="body-title mb-10">Category <span class="tf-color-1">*</span></div>
@@ -151,16 +133,9 @@
                     $("#galUpload").prepend(`<div class="item gitems"><img src="${URL.createObjectURL(val)}" alt=""></div>`);                        
                 });                    
             });
-            $("input[name='name']").on("input",function(){
-                $("input[name='slug']").val(StringToSlug($(this).val()));
-            });
             
         });
-        function StringToSlug(Text) {
-            return Text.toLowerCase()
-            .replace(/[^\w ]+/g, "")
-            .replace(/ +/g, "-");
-        }      
+     
 </script>
 
 <script>

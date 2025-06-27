@@ -11,7 +11,7 @@
 <div class="main-content-inner">                            
     <div class="main-content-wrap">
         <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-            <h3>Categories</h3>
+            <h3>Stock In</h3>
             <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                 <li>
                     <a href="{{route('admin.index')}}">
@@ -22,7 +22,7 @@
                     <i class="icon-chevron-right"></i>
                 </li>
                 <li>
-                    <div class="text-tiny">Categories</div>
+                    <div class="text-tiny">Stock In</div>
                 </li>
             </ul>
         </div>
@@ -39,7 +39,7 @@
                         </div>
                     </form>
                 </div>
-                <a class="tf-button style-1 w208" href="{{route('admin.categories.add')}}"><i class="icon-plus"></i>Add new</a>
+                <a class="tf-button style-1 w208" href="{{route('admin.stockin.add')}}"><i class="icon-plus"></i>Add new</a>
             </div>
             <div class="wg-table table-all-user">
                 <div class="table-responsive">
@@ -50,30 +50,34 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th class="p-2">Name</th>
-                                <th>Products</th>
+                                <th class="p-2">Product</th>
+                                <th>Supplier</th>
+                                <th>Quantity</th>
+                                <th>Date</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($categories as $category)
+                            @foreach ($stockIns as $stockIn)
                             <tr>
-                                <td>{{$category->id}}</td>
-                                <td class="p-2">{{$category->name}}</td>
-                                <td><a href="" target="_blank">0</a></td>
+                                <td>{{$stockIn->id}}</td>
+                                <td class="p-2">{{$stockIn->product->name}}</td>
+                                <td class="p-2">{{$stockIn->supplier->name}}</td>
+                                <td>{{$stockIn->quantity}}</td>
+                                <td>{{ \Carbon\Carbon::parse($stockIn->date)->format('d M Y') }}</td>
                                 <td>
                                     <div class="list-icon-function">
                                         <div class="item edit">
-                                            <a href="{{route('admin.categories.edit',['id'=>$category->id])}}">                                     
+                                            <a href="{{route('admin.stockin.edit',['id'=>$stockIn->id])}}">                                     
                                                 <i class="icon-edit-3"></i>
                                             </a>
                                         </div>
-                                        <form action="{{route('admin.categories.delete',['id'=>$category->id])}}" method="POST">
+                                        <form action="{{route('admin.stockin.delete',['id'=>$stockIn->id])}}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="item text-danger delete" type="submit" style="border: none; background: none;">
+                                            <div class="item text-danger delete">
                                                     <i class="icon-trash-2"></i>
-                                            </button>
+                                            </div>
                                         </form>
                                     </div>
                                 </td>
@@ -82,13 +86,14 @@
                         </tbody>
                     </table>                
                 </div>
-                <div class="divider">
-                    <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">
-                        {{$categories->links('pagination::bootstrap-5')}}
-                    </div>
+            <div class="divider">
+                <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">
+                    {{$stockIns->links('pagination::bootstrap-5')}}
                 </div>
             </div>
+           
         </div>
+    </div>
 </div>
 @endsection
 

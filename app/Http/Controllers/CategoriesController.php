@@ -33,11 +33,9 @@ class CategoriesController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'slug' => 'required|unique:categories,slug',
        ]);
        $categories = new categories();
        $categories->name = $request->name;
-       $categories->slug = Str::slug($request->name);
        $categories->save();
        return redirect()->route('admin.categories')->with('status','Record has been added successfully !');
     
@@ -67,11 +65,9 @@ class CategoriesController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'slug' => 'required|unique:categories,slug,'.$request->id,
         ]);
         $categories = categories::find($request->id);
         $categories->name = $request->name;
-        $categories->slug = $request->slug;     
         $categories->save();        
         return redirect()->route('admin.categories')->with('status','Record has been updated successfully !');
     }

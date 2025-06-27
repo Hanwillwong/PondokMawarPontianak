@@ -32,19 +32,14 @@
                     <input class="flex-grow" type="text" placeholder="Supplier Name" name="name" tabindex="0" value="{{old('name')}}" aria-required="true">                    
                 </fieldset>
                 @error("name") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
-                <fieldset class="name">
-                    <div class="body-title">Supplier Slug <span class="tf-color-1">*</span></div>
-                    <input class="flex-grow" type="text" placeholder="Supplier Slug" name="slug" tabindex="0" value="{{old('slug')}}" aria-required="true">                                       
-                </fieldset>
-                @error("slug") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
                 <fieldset class="phone_number">
                     <div class="body-title">Supplier Phone Number<span class="tf-color-1">*</span></div>
-                    <input class="flex-grow" type="text" placeholder="Supplier Phone Number" name="phone_number" tabindex="0" value="{{old('name')}}" aria-required="true">                    
+                    <input class="flex-grow" type="text" placeholder="Supplier Phone Number" name="phone_number" tabindex="0" value="{{old('phone_number')}}" aria-required="true">                    
                 </fieldset>
                 @error("phone_number") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
                 <fieldset class="address">
                     <div class="body-title">Supplier Address<span class="tf-color-1">*</span></div>
-                    <input class="flex-grow" type="text" placeholder="Supplier Address" name="address" tabindex="0" value="{{old('name')}}" aria-required="true">                    
+                    <input class="flex-grow" type="text" placeholder="Supplier Address" name="address" tabindex="0" value="{{old('address')}}" aria-required="true">                    
                 </fieldset>
                 @error("address") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
                 <div class="bot">
@@ -59,18 +54,3 @@
 </div>                    
 </div>
 @endsection
-
-@push("scripts")
-    <script>
-        $(function(){
-            $("input[name='name']").on("input", function(){
-                $("input[name='slug']").val(StringToSlug($(this).val()));
-            });
-        });
-        function StringToSlug(Text) {
-            return Text.toLowerCase()
-            .replace(/[^\w ]+/g, "")
-            .replace(/ +/g, "-");
-        }      
-    </script>
-@endpush

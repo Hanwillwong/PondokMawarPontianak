@@ -28,4 +28,9 @@ class products extends Model
     {
         return $this->hasMany(product_prices::class, 'product_id');
     }
+
+    public function stockIns()
+    {   
+        return $this->hasMany(stockIn::class, 'product_id');
+    }
 }

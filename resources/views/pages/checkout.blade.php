@@ -194,14 +194,14 @@
         console.log(text); // lihat output dulu
         const orderData = JSON.parse(text);
 
-        if (!orderData.order_id) {
+        if (!orderData.order_ref) {
             alert("Gagal menyimpan pesanan.");
             return;
         }
 
         if (paymentMethod !== 'midtrans') {
             // Jika COD, langsung redirect ke success
-            window.location.href = '/checkout/success?order_id=' + orderData.order_id;
+            window.location.href = '{{ route("order.confirmation") }}?order_ref=' + orderData.order_ref;
             return;
         }
 
@@ -213,7 +213,7 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                order_id: orderData.order_id
+                order_ref: orderData.order_ref
             })
         });
 
@@ -227,10 +227,10 @@
         // 🧠 Jalankan Snap
         window.snap.pay(tokenData.snapToken, {
             onSuccess: function(result){
-                window.location.href = '{{ route("order.confirmation") }}?order_id=' + orderData.order_id;
+                window.location.href = '{{ route("order.confirmation") }}?order_ref=' + orderData.order_ref;
             },
             onPending: function(result){
-                window.location.href = '/checkout/pending?order_id=' + orderData.order_id;
+                window.location.href = '/account-orders/';
             },
             onError: function(result){
                 alert('Pembayaran gagal');

@@ -54,7 +54,6 @@
                                 <th class="p-2">Name</th>
                                 <th>Category</th>
                                 <th>Brand</th>
-                                <th>Supplier</th>
                                 <th>Price</th>
                                 <th>Stock</th>
                                 <th>Action</th>
@@ -70,12 +69,10 @@
                                 <td class="pname">
                                     <div class="name">
                                         <a href="#" class="body-title-2">{{$product->name}}</a>
-                                        <div class="text-tiny mt-3">{{$product->slug}}</div>
                                     </div>  
                                 </td>
                                 <td>{{$product->category->name ?? '-' }}</td>
                                 <td>{{$product->brand->name ?? '-' }}</td>
-                                <td>{{$product->supplier->name ?? '-' }}</td>
                                 <td>{{$product->price}}</td>
                                 <td>{{$product->quantity}}</td>
                                 <td>
@@ -88,9 +85,9 @@
                                         <form action="{{route('admin.product.delete',['id'=>$product->id])}}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <div class="item text-danger delete">
+                                            <button class="item text-danger delete" style="border: none; background: none;">
                                                     <i class="icon-trash-2"></i>
-                                            </div>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>

@@ -8,9 +8,9 @@
               Pondok Mawar
             </a>
           </div>
-          <p class="footer-address">123 Beach Avenue, Surfside City, CA 00000</p>
-          <p class="m-0"><strong class="fw-medium">contact@surfsidemedia.in</strong></p>
-          <p><strong class="fw-medium">+1 000-000-0000</strong></p>
+          <p class="footer-address">Pasar Mawar, Jln. Hoscokroaminoto No. 16</p>
+          <p><strong class="fw-medium">+62821 5732 8288</strong></p>
+          <p><strong class="fw-medium">+62813 4501 7433</strong></p>
 
           <ul class="social-links list-unstyled d-flex flex-wrap mb-0">
             <li>
@@ -107,11 +107,7 @@
 
     <div class="footer-bottom">
       <div class="container d-md-flex align-items-center">
-        <span class="footer-copyright me-auto">©2024 Surfside Media</span>
-        <div class="footer-settings d-md-flex align-items-center">
-          <a href="privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp; <a href="terms-conditions.html">Terms &amp;
-            Conditions</a>
-        </div>
+        <span class="footer-copyright me-auto">©2025 Hanwill</span>
       </div>
     </div>
   </footer>
@@ -119,8 +115,8 @@
 
   <footer class="footer-mobile container w-100 px-5 d-md-none bg-body">
     <div class="row text-center">
-      <div class="col-4">
-        <a href="index.html" class="footer-mobile__link d-flex flex-column align-items-center">
+      <div class="col-6">
+        <a href="{{route('pages.index')}}" class="footer-mobile__link d-flex flex-column align-items-center">
           <svg class="d-block" width="18" height="18" viewBox="0 0 18 18" fill="none"
             xmlns="http://www.w3.org/2000/svg">
             <use href="#icon_home" />
@@ -129,26 +125,13 @@
         </a>
       </div>
 
-      <div class="col-4">
-        <a href="index.html" class="footer-mobile__link d-flex flex-column align-items-center">
+      <div class="col-6">
+        <a href="{{route('shop')}}" class="footer-mobile__link d-flex flex-column align-items-center">
           <svg class="d-block" width="18" height="18" viewBox="0 0 18 18" fill="none"
             xmlns="http://www.w3.org/2000/svg">
             <use href="#icon_hanger" />
           </svg>
           <span>Shop</span>
-        </a>
-      </div>
-
-      <div class="col-4">
-        <a href="index.html" class="footer-mobile__link d-flex flex-column align-items-center">
-          <div class="position-relative">
-            <svg class="d-block" width="18" height="18" viewBox="0 0 20 20" fill="none"
-              xmlns="http://www.w3.org/2000/svg">
-              <use href="#icon_heart" />
-            </svg>
-            <span class="wishlist-amount d-block position-absolute js-wishlist-count">3</span>
-          </div>
-          <span>Wishlist</span>
         </a>
       </div>
     </div>

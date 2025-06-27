@@ -51,7 +51,6 @@
                             <tr>
                                 <th>#</th>
                                 <th class="p-2">Name</th>
-                                <th>Slug</th>
                                 <th>Products</th>
                                 <th>Phone Number</th>
                                 <th>Address</th>
@@ -63,7 +62,6 @@
                             <tr>
                                 <td>{{$supplier->id}}</td>
                                 <td class="p-2">{{$supplier->name}}</td>
-                                <td>{{$supplier->slug}}</td>
                                 <td><a href="" target="_blank">0</a></td>
                                 <td>{{$supplier->phone_number}}</td>
                                 <td>{{$supplier->address}}</td>
@@ -77,9 +75,9 @@
                                         <form action="{{route('admin.supplier.delete',['id'=>$supplier->id])}}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <div class="item text-danger delete">
+                                            <button class="item text-danger delete" style="border: none; background: none;">
                                                     <i class="icon-trash-2"></i>
-                                            </div>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>

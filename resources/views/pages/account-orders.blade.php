@@ -71,9 +71,11 @@
                 <ul class="nav nav-tabs d-flex mb-4" id="orderTabs" role="tablist">
                   <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#all">Semua</a></li>
                   <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#unpaid">Belum Bayar</a></li>
-                  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#processing">Sedang Dikemas</a></li>
+                  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#processing">Sedang Diproses</a></li>
+                  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#ready">Siap Di Ambil</a></li>
                   <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#shipped">Dikirim</a></li>
                   <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#completed">Selesai</a></li>
+                  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#failed">Gagal</a></li>
               </ul>
 
                 {{-- ISI TAB --}}
@@ -90,17 +92,27 @@
 
                     {{-- SEDANG DIKEMAS --}}
                     <div class="tab-pane fade" id="processing">
-                        @include('components.order-list', ['orders' => $orders->where('status.label', 'sedang dikemas')])
+                        @include('components.order-list', ['orders' => $orders->where('status.label', 'ready to send')])
+                    </div>
+
+                    {{-- SIAP DIAMBIL --}}
+                    <div class="tab-pane fade" id="ready">
+                        @include('components.order-list', ['orders' => $orders->where('status.label', 'ready to pick up')])
                     </div>
 
                     {{-- DIKIRIM --}}
                     <div class="tab-pane fade" id="shipped">
-                        @include('components.order-list', ['orders' => $orders->where('status.label', 'dikirim')])
+                        @include('components.order-list', ['orders' => $orders->where('status.label', 'delivered')])
                     </div>
 
                     {{-- SELESAI --}}
                     <div class="tab-pane fade" id="completed">
-                        @include('components.order-list', ['orders' => $orders->where('status.label', 'paid')])
+                        @include('components.order-list', ['orders' => $orders->whereIn('status.label', 'completed')])
+                    </div>
+
+                    {{-- GAGAL --}}
+                    <div class="tab-pane fade" id="failed">
+                        @include('components.order-list', ['orders' => $orders->whereIn('status.label', 'failed')])
                     </div>
                 </div>
             @endif
@@ -111,49 +123,3 @@
   </main>
 
 @endsection
-
-@push('scripts')
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.btn-pay-now').forEach(function (button) {
-            button.addEventListener('click', async function () {
-                const orderId = this.dataset.orderId;
-
-                try {
-                    const response = await fetch('/midtrans/token/regenerate', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({ order_id: orderId })
-                    });
-
-                    const result = await response.json();
-
-                    if (!result.snapToken) {
-                        alert("Gagal mendapatkan Snap Token baru.");
-                        return;
-                    }
-
-                    window.snap.pay(result.snapToken, {
-                        onClose: function () {
-                            if (confirm('Kamu belum menyelesaikan pembayaran. Ingin coba lagi?')) {
-                                location.reload(); // atau bisa open kembali window.snap.pay
-                            }
-                        }
-                    });
-
-                } catch (error) {
-                    alert("Terjadi kesalahan saat mencoba membayar ulang.");
-                    console.error(error);
-                }
-            });
-        });
-    });
-</script>
-
-
-
-@endpush

@@ -2,19 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ecommerce;
+use App\Models\temp_orders;
 use Illuminate\Http\Request;
 
-class EcommerceController extends Controller
+class TempOrdersController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('pages.index', [
-            "tittle" => "E-Commerce"
-       ]);
+        //
     }
 
     /**
@@ -36,7 +34,7 @@ class EcommerceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ecommerce $ecommerce)
+    public function show(temp_orders $temp_orders)
     {
         //
     }
@@ -44,7 +42,7 @@ class EcommerceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ecommerce $ecommerce)
+    public function edit(temp_orders $temp_orders)
     {
         //
     }
@@ -52,7 +50,7 @@ class EcommerceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ecommerce $ecommerce)
+    public function update(Request $request, temp_orders $temp_orders)
     {
         //
     }
@@ -60,7 +58,7 @@ class EcommerceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ecommerce $ecommerce)
+    public function destroy(temp_orders $temp_orders)
     {
         //
     }

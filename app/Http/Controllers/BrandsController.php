@@ -33,11 +33,9 @@ class BrandsController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'slug' => 'required|unique:brands,slug',
        ]);
        $brand = new brands();
        $brand->name = $request->name;
-       $brand->slug = Str::slug($request->name);
        $brand->save();
        return redirect()->route('admin.brands')->with('status','Record has been added successfully !');
     }
@@ -66,11 +64,9 @@ class BrandsController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'slug' => 'required|unique:brands,slug,'.$request->id,
         ]);
         $brand = brands::find($request->id);
         $brand->name = $request->name;
-        $brand->slug = $request->slug;     
         $brand->save();        
         return redirect()->route('admin.brands')->with('status','Record has been updated successfully !');
     }

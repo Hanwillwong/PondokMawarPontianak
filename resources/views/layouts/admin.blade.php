@@ -27,6 +27,7 @@
   <link rel="apple-touch-icon-precomposed" href="{{ secure_asset('images/favicon.ico') }}">
   <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/sweetalert.min.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ secure_asset('css/custom.css') }}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   
 </head>
 <!-- [Head] end -->
@@ -53,12 +54,12 @@
 
 
 
-<script src="{{ secure_asset('js/jquery.min.js') }}" defer></script>
-<script src="{{ secure_asset('js/bootstrap.min.js') }}" defer></script>
-<script src="{{ secure_asset('js/bootstrap-select.min.js') }}" defer></script>   
-<script src="{{ secure_asset('js/sweetalert.min.js') }}" defer></script>    
-<script src="{{ secure_asset('js/apexcharts/apexcharts.js') }}" defer></script>
-<script src="{{ secure_asset('js/main.js') }}" defer></script>
+<script src="{{ secure_asset('js/jquery.min.js') }}"></script>
+<script src="{{ secure_asset('js/bootstrap.min.js') }}"></script>
+<script src="{{ secure_asset('js/bootstrap-select.min.js') }}"></script>   
+<script src="{{ secure_asset('js/sweetalert.min.js') }}"></script>    
+<script src="{{ secure_asset('js/apexcharts/apexcharts.js') }}"></script>
+<script src="{{ secure_asset('js/main.js') }}"></script>
 <script>
     (function ($) {
 
@@ -201,7 +202,7 @@
     }
 </script>
 
-<script src="{{ secure_asset('/sw.js') }}" defer></script>
+<script src="{{ secure_asset('/sw.js') }}"></script>
 <script>
 if ("serviceWorker" in navigator) {
     // Register a service worker hosted at the root of the

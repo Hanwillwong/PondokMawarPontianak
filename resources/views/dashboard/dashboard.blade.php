@@ -222,13 +222,13 @@
                             <tbody>
                                 @foreach($orders as $order)
                                     @php
-                                        $address = $order->user->user_address->first();
+                                         $address = $order->address;
                                     @endphp
                                     <tr>
                                         <a href="{{ route('admin.orders.show', $order->id) }}">
                                         <td class="text-center">{{ $order->created_at }}</td>
-                                        <td class="text-center">{{ $order->user->name ?? '-' }}</td>
-                                        <td class="text-center">0{{ $address->phone ?? '-' }}</td>
+                                        <td class="text-center">{{ $address->name ??  $order->user->name }}</td>
+                                        <td class="text-center">{{ $address->phone ??  $order->user->phone_number }}</td>
                                         
                                         <td class="text-center">{{ $order->status->label }}</td>
                                         <td class="text-center">{{ $order->order_detail->count() }}</td>

@@ -36,7 +36,7 @@
                         <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
                     </fieldset>
                     @error("name") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
-                    <fieldset class="name">
+                    <!-- <fieldset class="name">
                         <div class="body-title mb-10">Slug <span class="tf-color-1">*</span></div>
                         <input class="mb-10" type="text" placeholder="Enter product slug" name="slug" tabindex="0" value="" aria-required="true">
                         <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
@@ -53,7 +53,7 @@
                             </select>
                         </div>
                     </fieldset>
-                    @error("supplier_id") <span class="alert alert-danger text-center">{{$message}}</span> @enderror
+                    @error("supplier_id") <span class="alert alert-danger text-center">{{$message}}</span> @enderror -->
                     <div class="gap22 cols">
                         <fieldset class="category">
                             <div class="body-title mb-10">Category <span class="tf-color-1">*</span></div>

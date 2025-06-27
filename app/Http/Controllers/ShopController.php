@@ -55,37 +55,41 @@ class ShopController extends Controller
 
     public function search(Request $request)
     {
-        $keyword = $request->input('q');
+        $keyword = strtolower($request->input('q'));
         $brands = brands::all();
         $categories = categories::with('sampleProduct')->get();
-        
 
         $allProducts = products::with(['brand', 'supplier', 'category'])->get();
 
+        $keywordWords = explode(' ', $keyword); // Pecah input keyword menjadi kata-kata
         $matches = [];
+
         foreach ($allProducts as $product) {
-            $distance = levenshtein(strtolower($keyword), strtolower($product->name));
-            Log::info("Compare '$keyword' with '{$product->name}' => distance: $distance");
-            if ($distance < 5) {
+            $productNameWords = explode(' ', strtolower($product->name));
+            $minDistance = PHP_INT_MAX;
+
+            // Bandingkan setiap kata di keyword dengan setiap kata di nama produk
+            foreach ($keywordWords as $kw) {
+                foreach ($productNameWords as $pnw) {
+                    $distance = levenshtein($kw, $pnw);
+                    $minDistance = min($minDistance, $distance);
+                }
+            }
+
+            // Simpan kalau ada kecocokan cukup dekat (bisa diatur toleransinya di sini)
+            if ($minDistance <= 3) {
                 $matches[] = [
                     'product' => $product,
-                    'distance' => $distance,
+                    'distance' => $minDistance,
                 ];
             }
         }
 
-        $logDistances = [];
-        foreach ($matches as $match) {
-            $logDistances[] = [
-                'keyword' => $keyword,
-                'product_name' => $match['product']->name,
-                'distance' => $match['distance'],
-            ];
-        }
-
+        // Urutkan dari yang paling mirip
         usort($matches, fn($a, $b) => $a['distance'] <=> $b['distance']);
         $matchedProducts = collect($matches)->pluck('product');
 
+        // Paginasi
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
         $perPage = 10;
         $pagedResults = $matchedProducts->slice(($currentPage - 1) * $perPage, $perPage)->values();
@@ -94,15 +98,18 @@ class ShopController extends Controller
         $paginatedProducts->appends($request->all());
 
         return view('pages.shop', [
-            'products' => $paginatedProducts, // <-- ini yang dipakai untuk @foreach dan pagination
-            'logDistances' => $logDistances,
+            'products' => $paginatedProducts,
+            'logDistances' => [], // bisa isi log kalau perlu debugging
             'categories' => $categories,
             'brands' => $brands,
             'keyword' => $keyword,
-            'message' => 'Tidak ditemukan produk yang mirip dengan "' . $keyword . '"'  
+            'message' => $matchedProducts->isEmpty()
+                ? 'Tidak ditemukan produk yang mirip dengan "' . $keyword . '"'
+                : null,
         ]);
-
     }
+
+
 
 
 }

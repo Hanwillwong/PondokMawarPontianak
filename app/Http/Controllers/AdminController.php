@@ -15,26 +15,26 @@ class AdminController extends Controller
     {
 
         $pickupCount = orders::where('purchase_type', 'pickup')
-            ->whereIn('status_id', [1, 2])
+            ->whereIn('status_id', [12, 2]) //cod paid
             ->count();
 
         $deliveryCount = orders::where('purchase_type', 'delivery')
-            ->where('status_id', 2)
+            ->where('status_id', 2) //paid
             ->count();
 
-        $completedCount = orders::whereIn('status_id', [4,5])->count();
+        $completedCount = orders::whereIn('status_id', [4,5])->count(); //delivered completed
 
         $totalCount = $pickupCount + $deliveryCount;
 
         $pickupAmount = orders::where('purchase_type', 'pickup')
-            ->whereIn('status_id', [1, 2])
+            ->whereIn('status_id', [12, 2]) //cod paid
             ->sum('total_price');
 
         $deliveryAmount = orders::where('purchase_type', 'delivery')
-            ->where('status_id', 2)
+            ->where('status_id', 2) //paid
             ->sum('total_price');
 
-        $completedAmount = orders::whereIn('status_id', [4,5])
+        $completedAmount = orders::whereIn('status_id', [4,5]) //delivered completed
         ->sum('total_price');
 
         $totalAmount = $pickupAmount + $deliveryAmount;
@@ -46,18 +46,19 @@ class AdminController extends Controller
 
         if ($type === 'pickup') {
             $ordersQuery->where('purchase_type', 'pickup')
-                        ->whereIn('status_id', [2,1]);
+                        ->whereIn('status_id', [2,12]); //paid cod
             // Semua status untuk pickup
         } elseif ($type === 'delivery') {
             $ordersQuery->where('purchase_type', 'delivery')
-                        ->where('status_id', 2); // Hanya yang sudah dibayar
+                        ->where('status_id', 2); // paid
         } else {
             // Jika tanpa filter (All), ambil pickup semua status + delivery yang paid
             $ordersQuery->where(function ($query) {
                 $query->where('purchase_type', 'pickup')
+                    ->whereIn('status_id', [12,2]) //cod paid
                     ->orWhere(function ($subQuery) {
                         $subQuery->where('purchase_type', 'delivery')
-                                ->where('status_id', 2);
+                                ->where('status_id', 2); //cod
                     });
             });
         }
@@ -69,7 +70,13 @@ class AdminController extends Controller
 
     public function show($id)
     {
-        $order = orders::with(['user.user_address', 'order_detail.product', 'status'])->findOrFail($id);
+        $order = orders::with([
+            'user',
+            'address', // ambil alamat yang dipakai di order
+            'order_detail.product',
+            'status'
+        ])->findOrFail($id);
+
         $statuses = status::all(); // untuk dropdown ubah status
         return view('dashboard.order-detail', compact('order', 'statuses'));
     }
@@ -93,7 +100,7 @@ class AdminController extends Controller
 
         $ordersQuery = orders::with(['user.user_address', 'order_detail', 'status'])
             ->latest()
-            ->whereIn('status_id', [4,5]);
+            ->whereIn('status_id', [4,5]); //delivered completed
 
 
         $orders = $ordersQuery->paginate(10);
@@ -107,7 +114,7 @@ class AdminController extends Controller
 
         $ordersQuery = orders::with(['user.user_address', 'order_detail', 'status'])
             ->latest()
-            ->whereIn('status_id', [10,11]);
+            ->whereIn('status_id', [10,11]); //ready to pick up ready to send
 
 
         $orders = $ordersQuery->paginate(10);
@@ -124,19 +131,19 @@ class AdminController extends Controller
 
         if ($type === 'pickup') {
             $ordersQuery->where('purchase_type', 'pickup')
-                        ->whereIn('status_id', [1,2]);
+                        ->whereIn('status_id', [1,2]); // pending paid
             // Semua status untuk pickup
         } elseif ($type === 'delivery') {
             $ordersQuery->where('purchase_type', 'delivery')
-                        ->where('status_id', 2); // Hanya yang sudah dibayar
+                        ->where('status_id', 2); // paid
         } else {
             // Jika tanpa filter (All), ambil pickup semua status + delivery yang paid
             $ordersQuery->where(function ($query) {
                 $query->where('purchase_type', 'pickup')
-                    ->whereIn('status_id', [1,2])
+                    ->whereIn('status_id', [1,2]) // pending paid
                     ->orWhere(function ($subQuery) {
                         $subQuery->where('purchase_type', 'delivery')
-                                ->where('status_id', 2);
+                                ->where('status_id', 2); //paid
                     });
             });
         }

@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="{{ secure_asset('assets/css/style.css') }}" type="text/css" />
   <link rel="stylesheet" href="{{ secure_asset('assets/css/custom.css') }}" type="text/css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <style>
     #header {
@@ -272,13 +273,12 @@
   <div id="scrollTop" class="visually-hidden end-0"></div>
   <div class="page-overlay"></div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
-  <script src="{{ secure_asset('assets/js/plugins/jquery.min.js') }}" defer></script>
-  <script src="{{ secure_asset('assets/js/plugins/bootstrap.bundle.min.js') }}" defer></script>
-  <script src="{{ secure_asset('assets/js/plugins/bootstrap-slider.min.js') }}" defer></script>
-  <script src="{{ secure_asset('assets/js/plugins/swiper.min.js') }}" defer></script>
-  <script src="{{ secure_asset('assets/js/plugins/countdown.js') }}" defer></script>
-  <script src="{{ secure_asset('assets/js/theme.js') }}" defer></script>
+  <script src="{{ secure_asset('assets/js/plugins/jquery.min.js') }}"></script>
+  <script src="{{ secure_asset('assets/js/plugins/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ secure_asset('assets/js/plugins/bootstrap-slider.min.js') }}"></script>
+  <script src="{{ secure_asset('assets/js/plugins/swiper.min.js') }}"></script>
+  <script src="{{ secure_asset('assets/js/plugins/countdown.js') }}"></script>
+  <script src="{{ secure_asset('assets/js/theme.js') }}"></script>
 
   <script>
     $(document).ready(function () {

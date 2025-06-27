@@ -34,13 +34,11 @@ class SuppliersController extends Controller
             'name' => 'required',
             'phone_number' => 'required',
             'address' => 'required',
-            'slug' => 'required|unique:suppliers,slug',
        ]);
        $suppliers = new suppliers();
        $suppliers->name = $request->name;
        $suppliers->phone_number = $request->phone_number;
        $suppliers->address = $request->address;
-       $suppliers->slug = Str::slug($request->name);
        $suppliers->save();
        return redirect()->route('admin.suppliers')->with('status','Record has been added successfully !');
     
@@ -72,13 +70,11 @@ class SuppliersController extends Controller
             'name' => 'required',
             'phone_number' => 'required',
             'address' => 'required',
-            'slug' => 'required|unique:suppliers,slug,'.$request->id,
         ]);
         $suppliers = suppliers::find($request->id);
         $suppliers->name = $request->name;
         $suppliers->phone_number = $request->phone_number;
         $suppliers->address = $request->address;
-        $suppliers->slug = $request->slug;     
         $suppliers->save();        
         return redirect()->route('admin.suppliers')->with('status','Record has been updated successfully !');
     }

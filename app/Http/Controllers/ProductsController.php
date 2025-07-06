@@ -101,15 +101,24 @@ class ProductsController extends Controller
     /**
      * Display the specified resource.
      */
-   public function show($id)
+    public function show($id)
     {
-        $product = products::with('product_price')->findOrFail($id);
+        $product = products::with(['product_price', 'category'])->findOrFail($id);
 
         $cart = session()->get('cart', []);
         $qtyInCart = isset($cart[$product->id]) ? $cart[$product->id]['quantity'] : 0;
 
-        return view('pages.product-details', compact('product', 'qtyInCart'));
+        // Ambil produk lain dari kategori yang sama, kecuali produk ini sendiri
+        $relatedProducts = products::where('category_id', $product->category_id)
+                                ->where('id', '!=', $product->id)
+                                ->with('product_price')
+                                ->latest()
+                                ->take(4)
+                                ->get();
+
+        return view('pages.product-details', compact('product', 'qtyInCart', 'relatedProducts'));
     }
+
 
 
     /**

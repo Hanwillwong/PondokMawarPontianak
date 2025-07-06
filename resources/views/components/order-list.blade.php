@@ -5,7 +5,6 @@
                 <div>
                     <strong>#{{ $order->reference_number }}</strong>
                     <span class="badge bg-secondary ms-2">{{ ucfirst($order->purchase_type) }}</span>
-                    <span class="badge bg-warning text-dark ms-1">{{ strtoupper($order->payment_method) }}</span>
                 </div>
                 <span class="badge bg-info text-dark">{{ strtoupper($order->status->label ?? '-') }}</span>
             </div>

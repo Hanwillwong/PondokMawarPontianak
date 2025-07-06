@@ -113,7 +113,6 @@
                         </div>
                     </div>
 
-
                     <div class="wg-chart-default">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap14">
@@ -130,9 +129,12 @@
 
                 </div>
 
+                
+
             </div>
 
-            <div class="wg-box">
+
+            <!-- <div class="wg-box">
                 <div class="flex items-center justify-between">
                     <h5>Earnings revenue</h5>
                     <div class="dropdown default">
@@ -184,7 +186,7 @@
                     </div>
                 </div>
                 <div id="line-chart-8"></div>
-            </div>
+            </div> -->
 
         </div>
         

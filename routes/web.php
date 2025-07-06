@@ -136,13 +136,13 @@ Route::middleware([AuthAdmin::class])->group(function () {
 });
 
 // ==================== PUBLIC ROUTES ====================
-Route::get('/', [HomeController::class, 'index'])->name('pages.index');
+// Route::get('/', [HomeController::class, 'index'])->name('pages.index');
 Route::get('/dashboard', [DashboardController::class, 'index']);
 Route::get('/product/{id}', [ProductsController::class, 'show'])->name('product.show');
-Route::get('/shop', [ShopController::class, 'index'])->name('shop');
+Route::get('/', [ShopController::class, 'index'])->name('shop');
 Route::post('/midtrans/token', [CartController::class, 'createSnapToken'])->name('midtrans.token');
 
-Route::get('/shop/search', [ShopController::class, 'search'])->name('shop.search');
+Route::get('/search', [ShopController::class, 'search'])->name('shop.search');
 
 Route::get('/ajax/search-suggestion', [ShopController::class, 'ajaxSearchSuggestion'])->name('ajax.search.suggestion');
 

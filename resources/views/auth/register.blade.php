@@ -56,9 +56,6 @@
                             <input  id="password-confirm" type="password" class="form-control form-control_gray" name="password_confirmation" required autocomplete="new-password" >
                             <label for="password">Confirm Password *</label>                            
                         </div>
-                        <div class="d-flex align-items-center mb-3 pb-2">
-                            <p class="m-0">Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our privacy policy.</p>
-                        </div>
                         <button class="btn btn-primary w-100 text-uppercase" type="submit">Register</button>
                         <div class="customer-option mt-4 text-center">
                             <span class="text-secondary">Have an account?</span>

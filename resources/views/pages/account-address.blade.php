@@ -45,7 +45,7 @@
                         <p>{{ $address->city }}, {{ $address->province }}</p>
                         <p>Kode Pos: {{ $address->post_code }}</p>
                         <br>
-                        <p>Mobile : {{ $address->phone }}</p>
+                        <p>Phone : {{ $address->phone }}</p>
                     </div>
                 </div>
                 <hr>

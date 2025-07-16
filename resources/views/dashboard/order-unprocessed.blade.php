@@ -78,7 +78,7 @@
                                 <tr>
                                     <td class="text-center">{{ $order->created_at }}</td>
                                     <td class="text-center">{{ $order->user->name ?? '-' }}</td>
-                                    <td class="text-center">0{{ $address->phone ?? '-' }}</td>
+                                    <td class="text-center">{{ $address->phone ??  $order->user->phone_number }}</td>
                                     
                                     <td class="text-center">{{ $order->status->label }}</td>
                                     <td class="text-center">{{ $order->order_detail->count() }}</td>

@@ -61,8 +61,17 @@ class CartController extends Controller
         return view('pages.cart', compact('cartDetails'));
     }
 
-    public function index_confirmation() {
-        return view('pages.order-confirmation');
+    public function index_confirmation(Request $request)
+    {
+        $orderRef = $request->query('order_ref');
+
+        $order = orders::with(['order_detail.product'])->where('reference_number', $orderRef)->first();
+
+        if (!$order) {
+            return redirect()->route('home')->with('error', 'Order tidak ditemukan.');
+        }
+
+        return view('pages.order-confirmation', compact('order'));
     }
 
 
@@ -406,9 +415,6 @@ class CartController extends Controller
             return response()->json(['order_ref' => $ref]);
         }
 
-        // ✅ CASE 2: Selain COD pickup → Buat temp_order dan kurangi stok
-        $expiredAt = now()->addMinutes(2);
-
         // Cek dan kurangi stok
         foreach ($cart as $productId => $item) {
             $product = products::find($productId);
@@ -423,15 +429,24 @@ class CartController extends Controller
         }
 
         // Simpan ke temp_orders
-        temp_orders::create([
-            'user_id' => $user->id,
-            'reference_number' => $ref,
-            'cart' => json_encode($cart),
-            'payment_method' => $paymentMethod,
-            'purchase_type' => $purchase_type,
-            'address_id' => $addressId,
-            'expired_at' => $expiredAt,
-        ]);
+        Log::info('Sebelum simpan temp_orders', ['ref' => $ref]);
+
+        try {
+            temp_orders::create([
+                'user_id' => $user->id,
+                'reference_number' => $ref,
+                'cart' => json_encode($cart),
+                'payment_method' => $paymentMethod,
+                'purchase_type' => $purchase_type,
+                'address_id' => $addressId,
+            ]);
+            Log::info('Berhasil simpan temp_orders', ['ref' => $ref]);
+        } catch (\Exception $e) {
+            Log::error('Gagal simpan temp_orders: ' . $e->getMessage());
+            return response()->json(['error' => 'Gagal simpan temp_orders'], 500);
+        }
+
+
 
         session()->forget('cart');
 
@@ -644,7 +659,7 @@ class CartController extends Controller
             'expiry' => [
             'start_time' => now()->format('Y-m-d H:i:s O'),
             'unit' => 'minute',
-            'duration' => 2
+            'duration' => 15
             ]
         ];
 
@@ -789,6 +804,34 @@ class CartController extends Controller
             Log::error('Midtrans Notification Error: ' . $e->getMessage());
             return response()->json(['error' => 'Internal server error'], 500);
         }
+    }
+
+    public function paymentCancelled(Request $request)
+    {
+        $orderRef = $request->input('order_ref');
+
+        $temp = temp_orders::where('reference_number', $orderRef)->first();
+
+        if (!$temp) {
+            return response()->json(['message' => 'Order tidak ditemukan'], 404);
+        }
+
+        // Rollback stok
+        $cart = json_decode($temp->cart, true);
+        foreach ($cart as $productId => $item) {
+            $product = products::find($productId);
+            if ($product) {
+                $product->quantity += $item['quantity'];
+                $product->save();
+            }
+        }
+
+        // Hapus temp_order 
+        $temp->delete();
+
+        Log::info("Temp order {$orderRef} dibatalkan manual via Snap onClose. Stok dikembalikan.");
+
+        return response()->json(['message' => 'Order dibatalkan dan stok dikembalikan']);
     }
 
 }

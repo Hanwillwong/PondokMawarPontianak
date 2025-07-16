@@ -13,25 +13,60 @@ class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        $brands = brands::all();
-        $categories = categories::with('sampleProduct')->get();
+        // Ambil data brand dan kategori, lengkap dengan jumlah produk
+        $brands = brands::withCount('products')->get();
+        $categories = categories::with('sampleProduct')->withCount('products')->get();
 
-        // Ambil keyword dari input form (GET)
+        // Ambil input filter dari request
         $searchKeyword = $request->input('search-keyword');
+        $selectedBrands = $request->input('brands', []);
+        $selectedCategories = $request->input('categories', []);
+        $sortOption = $request->input('sort'); // << ini tambahan untuk sorting
 
-        // Mulai query produk
-        $query = products::with(['brand', 'supplier', 'category'])->orderBy('id', 'asc');
+        // Query awal produk
+        $query = products::with(['brand', 'supplier', 'category']);
 
-        // Jika ada keyword pencarian, filter berdasarkan nama produk
+        // Filter berdasarkan keyword
         if ($searchKeyword) {
             $query->where('name', 'like', '%' . $searchKeyword . '%');
         }
 
-        // Paginate hasilnya
+        // Filter berdasarkan kategori
+        if (!empty($selectedCategories)) {
+            $query->whereIn('category_id', $selectedCategories);
+        }
+
+        // Filter berdasarkan brand
+        if (!empty($selectedBrands)) {
+            $query->whereIn('brand_id', $selectedBrands);
+        }
+
+        // Sorting
+        switch ($sortOption) {
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            default:
+                $query->orderBy('id', 'asc'); // default
+        }
+
+        // Paginate + withQueryString agar filter tetap aktif saat pindah halaman
         $products = $query->paginate(10);
+        $products->appends($request->query());
 
         return view('pages.shop', compact('products', 'categories', 'brands'));
     }
+
+
 
     public function ajaxSearchSuggestion(Request $request)
     {

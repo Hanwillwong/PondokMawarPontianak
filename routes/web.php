@@ -59,7 +59,8 @@ Route::middleware(['auth'])->group(function () {
     // Checkout & Midtrans
     Route::get('/checkout', [CartController::class, 'index_checkout'])->name('checkout');
     Route::post('/checkout/store', [CartController::class, 'store'])->name('checkout.store');
-
+    Route::post('/payment-cancelled', [CartController::class, 'paymentCancelled']);
+    
     
     // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart');

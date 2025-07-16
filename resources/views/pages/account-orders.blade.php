@@ -48,11 +48,8 @@
       <div class="row">
         <div class="col-lg-3">
           <ul class="account-nav">
-            <li><a href="{{route('pages.account')}}" class="menu-link menu-link_us-s">Dashboard</a></li>
             <li><a href="{{ route('account.orders') }}" class="menu-link menu-link_us-s">Orders</a></li>
             <li><a href="{{route('pages.account-address')}}" class="menu-link menu-link_us-s">Addresses</a></li>
-            <li><a href="account-details.html" class="menu-link menu-link_us-s">Account Details</a></li>
-            <li><a href="account-wishlist.html" class="menu-link menu-link_us-s">Wishlist</a></li>
             <li>
                 <form method="POST" action="{{route('logout')}}" id="logout-form">
                     @csrf
@@ -92,7 +89,7 @@
 
                     {{-- SEDANG DIKEMAS --}}
                     <div class="tab-pane fade" id="processing">
-                        @include('components.order-list', ['orders' => $orders->where('status.label', 'ready to send')])
+                        @include('components.order-list', ['orders' => $orders->whereIn('status.label', ['ready to send','paid'])])
                     </div>
 
                     {{-- SIAP DIAMBIL --}}

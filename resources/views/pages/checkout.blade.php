@@ -236,7 +236,22 @@
                 alert('Pembayaran gagal');
             },
             onClose: function(){
-                alert('Anda menutup popup tanpa menyelesaikan pembayaran');
+                // User tutup popup sebelum bayar
+                fetch("/payment-cancelled", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        order_ref: orderData.order_ref
+                    })
+                }).then(res => res.json())
+                .then(data => {
+                    console.log(data.message);
+                }).catch(err => {
+                    console.error("Gagal rollback:", err);
+                });
             }
         });
     });

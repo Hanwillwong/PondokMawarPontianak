@@ -64,47 +64,63 @@ class MidtransController extends Controller
 
     public function handleNotification(Request $request)
     {
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        \Midtrans\Config::$isProduction = config('midtrans.is_production');
-        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
-        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
 
         try {
-            $notif = new \Midtrans\Notification();
+            $notif = new Notification();
             $transaction = $notif->transaction_status;
             $orderId = $notif->order_id;
 
-            $existingOrder = \App\Models\orders::where('reference_number', $orderId)->first();
+            $existingOrder = orders::where('reference_number', $orderId)->first();
 
-            $existingOrder = \App\Models\orders::where('reference_number', $orderId)->first();
+            $newStatus = null;
 
+            if ($transaction === 'capture') {
+                $newStatus = $notif->fraud_status === 'challenge' ? 'pending' : 'paid';
+            } elseif ($transaction === 'settlement') {
+                $newStatus = 'paid';
+            } elseif ($transaction === 'pending') {
+                $newStatus = 'pending';
+            } elseif (in_array($transaction, ['deny', 'cancel', 'expire'])) {
+                $newStatus = 'failed';
+            }
+
+            // Kalau order sudah ada
             if ($existingOrder) {
-                $newStatus = null;
-
-                if ($transaction === 'capture') {
-                    $newStatus = $notif->fraud_status === 'challenge' ? 'pending' : 'paid';
-                } elseif ($transaction === 'settlement') {
-                    $newStatus = 'paid';
-                } elseif ($transaction === 'pending') {
-                    $newStatus = 'pending';
-                } elseif (in_array($transaction, ['deny', 'cancel', 'expire'])) {
-                    $newStatus = 'failed';
-                }
-
                 if ($newStatus) {
                     $statusId = \App\Models\status::where('label', $newStatus)->value('id');
 
+                    // Jika status berubah
                     if ($statusId && $existingOrder->status_id !== $statusId) {
                         $existingOrder->status_id = $statusId;
                         $existingOrder->save();
-
                         Log::info("Order #{$orderId} status updated to {$newStatus}");
+                    }
+
+                    // Tambahkan rollback stok jika status gagal
+                    if ($newStatus === 'failed') {
+                        $temp = \App\Models\temp_orders::where('reference_number', $orderId)->first();
+                        if ($temp) {
+                            $cart = json_decode($temp->cart, true);
+                            foreach ($cart as $productId => $item) {
+                                $product = \App\Models\products::find($productId);
+                                if ($product) {
+                                    $product->quantity += $item['quantity'];
+                                    $product->save();
+                                }
+                            }
+                            $temp->delete();
+                        }
                     }
                 }
 
                 return response()->json(['message' => 'Order status updated']);
             }
 
+            // Order belum ada, cari temp_orders
             $temp = null;
             $retry = 0;
             while (!$temp && $retry < 5) {
@@ -117,11 +133,6 @@ class MidtransController extends Controller
 
             if (!$temp) {
                 Log::warning('Temp order not found setelah 5x retry', ['order_id' => $orderId]);
-                return response()->json(['error' => 'Temp order not found'], 404);
-            }
-
-            if (!$temp) {
-                Log::warning('Temp order not found', ['order_id' => $orderId]);
                 return response()->json(['error' => 'Temp order not found'], 404);
             }
 
@@ -143,14 +154,7 @@ class MidtransController extends Controller
 
                 $quantity = $item['quantity'];
 
-                // ✅ CEK STOK
-                if ($product->quantity < $quantity) {
-                    Log::warning("Stok tidak cukup untuk produk {$product->name}");
-                    return response()->json(['error' => 'Stok tidak cukup untuk produk: '.$product->name], 400);
-                }
-
                 $price = $product->price;
-
                 foreach ($product->product_price as $tier) {
                     if ($quantity >= $tier->min_quantity) {
                         $price = $tier->price;
@@ -168,22 +172,26 @@ class MidtransController extends Controller
                 ];
             }
 
+            // Jika transaksi gagal, rollback stok dan hapus temp
+            if ($newStatus === 'failed') {
+                foreach ($cart as $productId => $item) {
+                    $product = \App\Models\products::find($productId);
+                    if ($product) {
+                        $product->quantity += $item['quantity'];
+                        $product->save();
+                    }
+                }
+
+                $temp->delete();
+                Log::info("Temp order {$orderId} dihapus karena status transaksi failed.");
+                return response()->json(['message' => 'Transaksi gagal. Stok dikembalikan dan order dibatalkan.']);
+            }
+
+            // Simpan order baru
             $order = new \App\Models\orders();
             $order->user_id = $user->id;
             $order->reference_number = $orderId;
-
-            $status = 'pending'; // default
-
-            if ($transaction === 'capture' || $transaction === 'settlement') {
-                $status = 'paid';
-            } elseif ($transaction === 'pending') {
-                $status = 'pending';
-            } elseif (in_array($transaction, ['deny', 'cancel', 'expire'])) {
-                $status = 'failed';
-            }
-
-            $order->status_id = \App\Models\status::where('label', $status)->first()->id;
-
+            $order->status_id = \App\Models\status::where('label', $newStatus ?? 'pending')->value('id');
             $order->total_price = $total;
             $order->payment_method = $temp->payment_method;
             $order->purchase_type = $temp->purchase_type;
@@ -195,6 +203,7 @@ class MidtransController extends Controller
                 \App\Models\order_details::create($detail);
             }
 
+            // Notifikasi Web Push
             $auth = [
                 'VAPID' => [
                     'subject' => env('VAPID_SUBJECT'),
@@ -218,15 +227,18 @@ class MidtransController extends Controller
                 );
             }
 
-            // Hapus dari temp_orders
-            $temp->delete();
-
+            if ($newStatus === 'paid') {
+                $temp->delete();
+                Log::info("Temp order {$orderId} dihapus setelah status {$newStatus}.");
+            }
             return response()->json(['message' => 'Order berhasil disimpan']);
+
         } catch (\Exception $e) {
             Log::error('Midtrans Notification Error: ' . $e->getMessage());
             return response()->json(['error' => 'Internal server error'], 500);
         }
     }
+
 
     public function regenerateSnapToken(Request $request)
     {

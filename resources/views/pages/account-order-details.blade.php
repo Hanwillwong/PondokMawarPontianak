@@ -48,11 +48,8 @@
       <div class="row">
         <div class="col-lg-3">
           <ul class="account-nav">
-            <li><a href="{{route('pages.account')}}" class="menu-link menu-link_us-s">Dashboard</a></li>
             <li><a href="{{ route('account.orders') }}" class="menu-link menu-link_us-s">Orders</a></li>
             <li><a href="{{route('pages.account-address')}}" class="menu-link menu-link_us-s">Addresses</a></li>
-            <li><a href="account-details.html" class="menu-link menu-link_us-s">Account Details</a></li>
-            <li><a href="account-wishlist.html" class="menu-link menu-link_us-s">Wishlist</a></li>
             <li>
                 <form method="POST" action="{{route('logout')}}" id="logout-form">
                     @csrf
@@ -114,7 +111,7 @@
                             <p class="mt-3 mb-0"><small class="text-muted">Transfer ke nomor VA ini untuk menyelesaikan pembayaran.</small></p>
                             <p class="mb-0"><small class="text-muted">Transaksi dibuat: {{ date('d M Y H:i', strtotime($midtrans->transaction_time)) }}</small></p>
                             @php
-                                $expiredTime = \Carbon\Carbon::parse($midtrans->transaction_time)->addHours(24); // atau ganti dengan waktu yang kamu tetapkan
+                                $expiredTime = \Carbon\Carbon::parse($midtrans->transaction_time)->addMinutes(15); // atau ganti dengan waktu yang kamu tetapkan
                             @endphp
                             <div class="mt-3">
                                 <h6 class="mb-1">Batas Waktu Pembayaran:</h6>
@@ -194,7 +191,6 @@
 @push('scripts')
 <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
 <script>
-    // Atur waktu kadaluarsa dari server ke JS
     const expireAt = new Date("{{ $expiredTime->format('Y-m-d H:i:s') }}").getTime();
 
     const countdownInterval = setInterval(function () {

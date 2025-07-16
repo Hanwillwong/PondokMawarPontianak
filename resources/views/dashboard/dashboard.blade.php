@@ -2,194 +2,133 @@
 @section('container')
 <div class="main-content-inner">
     <div class="main-content-wrap">
-        <div class="tf-section-2 mb-30">
-            <div class="flex gap20 flex-wrap-mobile">
-                <div class="w-half">
+        <div class="mb-30">
+            <div class="row g-3">
 
-                    <div class="wg-chart-default mb-20">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap14">
-                                <div class="image ic-bg">
-                                    <i class="icon-shopping-bag"></i>
-                                </div>
-                                <div>
-                                    <div class="body-text mb-2">Ongoing Orders</div>
-                                    <h4>{{ $totalCount }}</h4>
-                                </div>
+                {{-- 1 --}}
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="wg-chart-default h-100">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="image ic-bg"><i class="icon-shopping-bag"></i></div>
+                            <div>
+                                <div class="body-text mb-2">Ongoing Orders</div>
+                                <h4>{{ $ongoingCount }}</h4>
                             </div>
                         </div>
                     </div>
-
-
-                    <div class="wg-chart-default mb-20">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap14">
-                                <div class="image ic-bg">
-                                    <i class="icon-dollar-sign"></i>
-                                </div>
-                                <div>
-                                    <div class="body-text mb-2">Total Amount</div>
-                                    <h4>Rp {{ number_format($totalAmount, 0) }}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="wg-chart-default mb-20">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap14">
-                                <div class="image ic-bg">
-                                    <i class="icon-shopping-bag"></i>
-                                </div>
-                                <div>
-                                    <div class="body-text mb-2">Delivery Orders</div>
-                                    <h4>{{$deliveryCount}}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="wg-chart-default">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap14">
-                                <div class="image ic-bg">
-                                    <i class="icon-dollar-sign"></i>
-                                </div>
-                                <div>
-                                    <div class="body-text mb-2">Delivery Orders Amount</div>
-                                    <h4>Rp {{number_format($deliveryAmount,0) }}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
 
-                <div class="w-half">
-
-                    <div class="wg-chart-default mb-20">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap14">
-                                <div class="image ic-bg">
-                                    <i class="icon-shopping-bag"></i>
+                {{-- 2 --}}
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="wg-chart-default h-100">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="image ic-bg">
+                                <div class="image ic-bg d-flex align-items-center justify-content-center fw-bold" style="font-size: 18px; color:#2275fc;">
+                                    Rp
                                 </div>
-                                <div>
-                                    <div class="body-text mb-2">Completed Orders</div>
-                                    <h4>{{$completedCount}}</h4>
-                                </div>
+                            </div>
+                            <div>
+                                <div class="body-text mb-2">Ongoing Amount</div>
+                                <h4>Rp {{ number_format($ongoingAmount, 0) }}</h4>
                             </div>
                         </div>
                     </div>
-
-
-                    <div class="wg-chart-default mb-20">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap14">
-                                <div class="image ic-bg">
-                                    <i class="icon-dollar-sign"></i>
-                                </div>
-                                <div>
-                                    <div class="body-text mb-2">Completed Orders Amount</div>
-                                    <h4>Rp {{number_format($completedAmount,0) }}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="wg-chart-default mb-20">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap14">
-                                <div class="image ic-bg">
-                                    <i class="icon-shopping-bag"></i>
-                                </div>
-                                <div>
-                                    <div class="body-text mb-2">Pickup Orders</div>
-                                    <h4>{{$pickupCount}}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="wg-chart-default">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap14">
-                                <div class="image ic-bg">
-                                    <i class="icon-dollar-sign"></i>
-                                </div>
-                                <div>
-                                    <div class="body-text mb-2">Pickup Orders Amount</div>
-                                    <h4>Rp {{ number_format($pickupAmount,0) }}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
 
-                
+                {{-- 3 --}}
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="wg-chart-default h-100">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="image ic-bg"><i class="icon-shopping-bag"></i></div>
+                            <div>
+                                <div class="body-text mb-2">Delivery Orders</div>
+                                <h4>{{ $deliveryCount }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 4 --}}
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="wg-chart-default h-100">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="image ic-bg">
+                                <div class="image ic-bg d-flex align-items-center justify-content-center fw-bold" style="font-size: 18px; color:#2275fc;">
+                                    Rp
+                                </div>
+                            </div>
+                            <div>
+                                <div class="body-text mb-2">Delivery Orders Amount</div>
+                                <h4>Rp {{ number_format($deliveryAmount, 0) }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 5 --}}
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="wg-chart-default h-100">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="image ic-bg"><i class="icon-shopping-bag"></i></div>
+                            <div>
+                                <div class="body-text mb-2">Completed Orders</div>
+                                <h4>{{ $completedCount }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 6 --}}
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="wg-chart-default h-100">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="image ic-bg">
+                                <div class="image ic-bg d-flex align-items-center justify-content-center fw-bold" style="font-size: 18px; color:#2275fc;">
+                                    Rp
+                                </div>
+                            </div>
+                            <div>
+                                <div class="body-text mb-2">Completed Orders</div>
+                                <h4>Rp {{ number_format($completedAmount, 0) }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 7 --}}
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="wg-chart-default h-100">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="image ic-bg"><i class="icon-shopping-bag"></i></div>
+                            <div>
+                                <div class="body-text mb-2">Pickup Orders</div>
+                                <h4>{{ $pickupCount }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 8 --}}
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="wg-chart-default h-100">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="image ic-bg">
+                                <div class="image ic-bg d-flex align-items-center justify-content-center fw-bold" style="font-size: 18px; color:#2275fc;">
+                                    Rp
+                                </div>
+                            </div>
+                            <div>
+                                <div class="body-text mb-2">Pickup Orders Amount</div>
+                                <h4>Rp {{ number_format($pickupAmount, 0) }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
-
-
-            <!-- <div class="wg-box">
-                <div class="flex items-center justify-between">
-                    <h5>Earnings revenue</h5>
-                    <div class="dropdown default">
-                        <button class="btn btn-secondary dropdown-toggle" type="button"
-                            data-bs-toggle="dropdown" aria-haspopup="true"
-                            aria-expanded="false">
-                            <span class="icon-more"><i class="icon-more-horizontal"></i></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a href="javascript:void(0);">This Week</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);">Last Week</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="flex flex-wrap gap40">
-                    <div>
-                        <div class="mb-2">
-                            <div class="block-legend">
-                                <div class="dot t1"></div>
-                                <div class="text-tiny">Revenue</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap10">
-                            <h4>$37,802</h4>
-                            <div class="box-icon-trending up">
-                                <i class="icon-trending-up"></i>
-                                <div class="body-title number">0.56%</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="mb-2">
-                            <div class="block-legend">
-                                <div class="dot t2"></div>
-                                <div class="text-tiny">Order</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap10">
-                            <h4>$28,305</h4>
-                            <div class="box-icon-trending up">
-                                <i class="icon-trending-up"></i>
-                                <div class="body-title number">0.56%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="line-chart-8"></div>
-            </div> -->
-
         </div>
-        
+
+
             <div class="wg-box">
                 <div class="flex items-center justify-between">
                     <h5>Recent orders</h5>

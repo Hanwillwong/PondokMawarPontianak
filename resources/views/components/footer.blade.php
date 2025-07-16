@@ -5,7 +5,7 @@
         <div class="row row-cols-lg-5 row-cols-2">
           <div class="footer-column footer-store-info col-12 mb-4 mb-lg-0">
             <div class="logo">
-              <a href="index.html" class="fs-3">
+              <a href="/" class="fs-3">
                 Pondok Mawar
               </a>
             </div>

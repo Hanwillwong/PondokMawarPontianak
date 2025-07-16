@@ -80,7 +80,9 @@
                                     <td>{{ $item->product->name ?? '-' }}</td>
                                     <td>{{ $item->quantity }}</td>
                                     <td class="text-end">Rp {{ number_format($item->product->price ?? 0, 2) }}</td>
-                                    <td class="text-end">Rp {{ number_format($item->total_price, 2) }}</td>
+                                    <td class="text-end">
+                                        Rp {{ number_format($item->price_at_order * $item->quantity, 2) }}
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>

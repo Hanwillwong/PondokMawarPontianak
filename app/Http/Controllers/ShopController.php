@@ -66,28 +66,6 @@ class ShopController extends Controller
         return view('pages.shop', compact('products', 'categories', 'brands'));
     }
 
-
-
-    public function ajaxSearchSuggestion(Request $request)
-    {
-        $keyword = $request->input('q');
-        if (!$keyword) return response()->json([]);
-
-        $products = products::select('name')
-            ->get()
-            ->map(function ($product) use ($keyword) {
-                return [
-                    'name' => $product->name,
-                    'distance' => levenshtein(strtolower($keyword), strtolower($product->name)),
-                ];
-            })
-            ->sortBy('distance')
-            ->take(5)
-            ->values();
-
-        return response()->json($products);
-    }
-
     public function search(Request $request)
     {
         $keyword = strtolower($request->input('q'));

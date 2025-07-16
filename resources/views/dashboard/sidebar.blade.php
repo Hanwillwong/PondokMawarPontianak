@@ -1,6 +1,6 @@
 <div class="section-menu-left">
                     <div class="box-logo">
-                        <a href="{{route('admin.index')}}" id="site-logo-inner" class="fs-1 m-2">
+                        <a href="/" id="site-logo-inner" class="fs-1 m-2">
                             Pondok Mawar
                         </a>
                         <div class="button-show-hide">

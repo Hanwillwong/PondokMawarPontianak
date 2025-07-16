@@ -136,34 +136,60 @@
 
                 <!-- Product Default -->
                 @foreach ($products as $product)
-                <div class="product-card-wrapper">
-                <div class="product-card mb-3 mb-md-4 mb-xxl-5">
-                    <div class="pc__img-wrapper">
-                    <div class="swiper-container background-img js-swiper-slider" data-settings='{"resizeObserver": true}'>
-                        <div class="swiper-wrapper">
-                        <div class="swiper-slide">
+                    <div class="product-card-wrapper">
+                        <div class="product-card mb-3 mb-md-4 mb-xxl-5">
+                            <div class="pc__img-wrapper position-relative">
+                                <div class="swiper-container background-img js-swiper-slider" data-settings='{"resizeObserver": true}'>
+                                    <div class="swiper-wrapper">
+                                        <div class="swiper-slide">
+                                            <a href="{{ route('product.show', $product->id) }}">
+                                                <img loading="lazy" src="{{ asset('uploads/products') }}/{{ $product->image }}" width="330"
+                                                    height="400"
+                                                    alt="{{ $product->name }}"
+                                                    class="pc__img w-100"
+                                                    @if ($product->quantity == 0)
+                                                        style="filter: grayscale(100%) brightness(0.7);" 
+                                                        class="opacity-50"
+                                                    @endif
+                                                >
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            <a href="{{ route('product.show', $product->id) }}"><img loading="lazy" src="{{asset('uploads/products')}}/{{$product->image}}" width="330"
-                                height="400" alt="Cropped Faux leather Jacket" class="pc__img"></a>
-                        </div>
-                        </div>
-                    </div>
-                    <form action="{{ route('cart.add') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="id" value="{{ $product->id }}">
-                    </form>
-                    </div>
+                                @if ($product->quantity == 0)
+                                    <div style="z-index: 999; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+                                        class="bg-secondary text-white px-3 py-1 rounded-pill small fw-bold text-center">
+                                        Stok Habis
+                                    </div>
+                                @endif
 
-                    <div class="pc__info position-relative">
-                    <p class="pc__category">{{$product->category->name ?? '-' }}</p>
-                    <h6 class="pc__title"><a href="details.html">{{$product->name}}</a></h6>
-                    <div class="product-card__price d-flex">
-                        <span class="money price">Rp. {{ number_format($product->price, 0, ',', '.') }}</span>
+                                <form action="{{ route('cart.add') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="id" value="{{ $product->id }}">
+                                </form>
+                            </div>
+
+                            <div class="pc__info position-relative">
+                                <div class="d-flex justify-content-between">
+                                    <p class="pc__category mb-0">
+                                        {{ $product->category->name ?? '-' }}
+                                    </p>
+                                    <p class="pc__category mb-0 text-muted">
+                                        Stok: {{ $product->quantity }}
+                                    </p>
+                                </div>
+                                <h6 class="pc__title">
+                                    <a href="{{ route('product.show', $product->id) }}">{{ $product->name }}</a>
+                                </h6>
+                                <div class="product-card__price d-flex">
+                                    <span class="money price">Rp. {{ number_format($product->price, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    </div>
-                </div>
-                </div>
                 @endforeach
+
 
 
             </div>

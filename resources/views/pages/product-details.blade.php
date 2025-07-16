@@ -12,7 +12,10 @@
                 <div class="swiper-wrapper">
                     <div class="swiper-slide product-single__image-item">
                     <img loading="lazy" class="h-auto" src="{{asset('uploads/products')}}/{{$product->image}}" width="674"
-                        height="674" alt="" />
+                        height="674" alt="" @if ($product->quantity == 0)
+                            style="filter: grayscale(100%) brightness(0.7);" 
+                            class="opacity-50"
+                        @endif>
                     <a data-fancybox="gallery" href="{{asset('uploads/products')}}/{{$product->image}}" data-bs-toggle="tooltip"
                         data-bs-placement="left" title="Zoom">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -142,25 +145,46 @@
             }'>
             <div class="swiper-wrapper">
                 @forelse ($relatedProducts as $related)
-                <div class="swiper-slide product-card">
-                    <div class="pc__img-wrapper">
-                    <a href="details.html">
-                        <a href="{{ route('product.show', $related->id) }}"><img loading="lazy" src="{{asset('uploads/products')}}/{{$related->image}}" width="330"
-                                    height="400" alt="Cropped Faux leather Jacket" class="pc__img"></a>
-                    </a>
-                    </div>
+                    <div class="swiper-slide product-card">
+                        <div class="pc__img-wrapper position-relative">
 
-                    <div class="pc__info position-relative">
-                        <p class="pc__category">{{ $related->category->name }}</p>
-                        <h6 class="pc__title"><a href="details.html">{{ $related->name }}</a></h6>
-                        <div class="product-card__price d-flex">
-                            <span class="money price">Rp {{ number_format($related->price, 0, ',', '.') }}</span>
+                            {{-- Label Stok Habis --}}
+                            @if ($related->quantity == 0)
+                                <div style="z-index: 999; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+                                    class="bg-secondary text-white px-3 py-1 rounded-pill small fw-bold text-center">
+                                    Stok Habis
+                                </div>
+                            @endif
+
+                            <a href="{{ route('product.show', $related->id) }}">
+                                <img 
+                                    loading="lazy" 
+                                    src="{{ asset('uploads/products') }}/{{ $related->image }}" 
+                                    width="330" 
+                                    height="400" 
+                                    alt="{{ $related->name }}"
+                                    class="pc__img w-100 @if($related->quantity == 0) opacity-50 @endif"
+                                    @if($related->quantity == 0)
+                                        style="filter: grayscale(100%) brightness(0.7);"
+                                    @endif
+                                >
+                            </a>
+                        </div>
+
+                        <div class="pc__info position-relative">
+                            <p class="pc__category">{{ $related->category->name }}</p>
+                            <h6 class="pc__title">
+                                <a href="{{ route('product.show', $related->id) }}">{{ $related->name }}</a>
+                            </h6>
+                            <div class="product-card__price d-flex">
+                                <span class="money price">Rp {{ number_format($related->price, 0, ',', '.') }}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
                 @empty
                     <p>No related products found.</p>
-            @endforelse
+                @endforelse
+
             </div><!-- /.swiper-wrapper -->
         </div><!-- /.swiper-container js-swiper-slider -->
 

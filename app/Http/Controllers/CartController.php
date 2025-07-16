@@ -71,7 +71,25 @@ class CartController extends Controller
             return redirect()->route('home')->with('error', 'Order tidak ditemukan.');
         }
 
-        return view('pages.order-confirmation', compact('order'));
+        $midtrans = null;
+
+        $expiredTime = $order->created_at->addHour();
+
+        if ($order->payment_method === 'midtrans') {
+            try {
+                \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+                \Midtrans\Config::$isProduction = false;
+                \Midtrans\Config::$isSanitized = true;
+                \Midtrans\Config::$is3ds = true;
+
+                $midtrans = \Midtrans\Transaction::status($order->reference_number);
+            } catch (\Exception $e) {
+                Log::error('Midtrans error: ' . $e->getMessage());
+                $midtrans = null;
+            }
+        }
+
+        return view('pages.order-confirmation', compact('order','midtrans'));
     }
 
 
@@ -160,158 +178,6 @@ class CartController extends Controller
     {
         //
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    // public function store(Request $request)
-    // {
-    //     $user = auth()->user();
-    //     $cart = session('cart', []);
-
-    //     if (empty($cart)) {
-    //         return redirect()->route('cart')->with('error', 'Keranjang belanja kosong.');
-    //     }
-
-    //     $purchase_type = $request->input('shipping_method'); // pickup / delivery
-    //     $paymentMethod = $request->input('payment_method');   // cod / midtrans
-    //     $addressId = $request->input('address_id');           // required jika delivery
-
-    //     if ($purchase_type === 'delivery' && $paymentMethod === 'cod') {
-    //         return response()->json(['error' => 'COD hanya tersedia untuk pickup'], 400);
-    //     }
-        
-    //     if ($purchase_type === 'delivery' && !$addressId) {
-    //         if ($request->expectsJson()) {
-    //             return response()->json(['error' => 'Silakan pilih alamat pengiriman.'], 400);
-    //         }
-    //         return back()->with('error', 'Silakan pilih alamat pengiriman.');
-    //     }
-
-    //     // Ambil produk dari database
-    //     $productIds = array_keys($cart);
-    //     $products = \App\Models\products::with('product_price')->whereIn('id', $productIds)->get()->keyBy('id');
-
-    //     $total = 0;
-    //     $orderDetails = [];
-
-    //     foreach ($cart as $productId => $item) {
-    //         $product = $products[$productId] ?? null;
-    //         if (!$product) continue;
-
-    //         $quantity = $item['quantity'];
-    //         $price = $product->price;
-
-    //         foreach ($product->product_price as $tier) {
-    //             if ($quantity >= $tier->min_quantity) {
-    //                 $price = $tier->price;
-    //             }
-    //         }
-
-    //         $subtotal = $price * $quantity;
-    //         $total += $subtotal;
-
-    //         $orderDetails[] = [
-    //             'product_id' => $product->id,
-    //             'price_at_order' => $price,
-    //             'quantity' => $quantity,
-    //             'subtotal' => $subtotal,
-    //         ];
-    //     }
-
-    //     // Simpan order
-    //     $order = new \App\Models\orders();
-    //     $order->user_id = $user->id;
-    //     $order->status_id = status::where('label', $paymentMethod === 'midtrans' ? 'pending' : 'processing')->first()->id;
-    //     $order->total_price = $total;
-    //     $order->payment_method = $paymentMethod;
-    //     $order->purchase_type = $purchase_type;
-    //     $order->address_id = $purchase_type === 'delivery' ? $addressId : null;
-    //     $order->reference_number = 'ORD-' . strtoupper(Str::random(10));
-    //     $order->save();
-
-    //     // Setelah simpan order dan order_details
-    //     foreach ($orderDetails as $detail) {
-    //         $detail['order_id'] = $order->id;
-    //         order_details::create($detail);
-    //     }
-
-    //     // Buat item_details untuk Midtrans
-    //     $items = [];
-    //     foreach ($order->order_detail as $detail) {
-    //         $product = products::find($detail['product_id']);
-    //         $items[] = [
-    //             'id' => $detail['product_id'],
-    //             'price' => $detail['price_at_order'],
-    //             'quantity' => $detail['quantity'],
-    //             'name' => Str::limit(preg_replace('/[^A-Za-z0-9 ]/', '', $product->name), 50),
-    //         ];
-    //     }
-
-    //     $address = $order->address_id ? user_addresses::find($order->address_id) : null;
-
-    //     $params = [
-    //         'transaction_details' => [
-    //             'order_id' => $order->reference_number,
-    //             'gross_amount' => max($order->total_price, 100),
-    //         ],
-    //         'item_details' => $items,
-    //         'customer_details' => [
-    //             'first_name' => $user->name,
-    //             'email' => $user->email,
-    //             'shipping_address' => $address ? [
-    //                 'first_name' => $address->name,
-    //                 'phone' => $address->phone,
-    //                 'address' => $address->address,
-    //                 'city' => $address->city,
-    //                 'postal_code' => $address->post_code,
-    //                 'country_code' => 'IDN',
-    //             ] : [],
-    //         ],
-    //     ];
-
-    //     $snap = Snap::createTransaction($params);
-
-    //     $order->snap_token = $snap->token;
-    //     $order->snap_redirect_url = $snap->redirect_url; // Tambahkan kolom ini di tabel orders
-    //     $order->save();
-
-    //     // ✅ Kosongkan cart (opsional)
-    //     // session()->forget('cart');
-
-
-    //     $auth = [
-    //         'VAPID' => [
-    //             'subject' => env('VAPID_SUBJECT'),
-    //             'publicKey' => env('VAPID_PUBLIC_KEY'),
-    //             'privateKey' => env('VAPID_PRIVATE_KEY'),
-    //         ]
-    //     ];
-
-    //     $webPush = new WebPush($auth);
-
-    //     $payload = json_encode([
-    //         'title' => 'Order Baru Masuk',
-    //         'body' => 'Ada pesanan baru dari ' . $user->name,
-    //         'url' => url('/admin') // URL admin ke halaman orders
-    //     ]);
-
-    //     foreach (PushSubscription::all() as $sub) {
-    //         $webPush->sendOneNotification(
-    //             Subscription::create($sub->subscription),
-    //             $payload
-    //         );
-    //     }
-
-    //     // ✅ Return Snap Token agar langsung bisa dipakai untuk memunculkan popup
-    //     return response()->json([
-    //         'success' => true,
-    //         'snapToken' => $snap->token,
-    //         'redirect_url' => $snap->redirect_url,
-    //         'order_id' => $order->id,
-    //     ]);
-
-    // }
 
     public function store(Request $request)
     {
@@ -530,63 +396,7 @@ class CartController extends Controller
         Config::$is3ds = config('midtrans.is_3ds');
     }
 
-    // public function createSnapToken(Request $request)
-    // {
-    //     try {
-    //         $order = orders::with('user', 'order_detail.product')
-    //             ->where('user_id', auth()->id())
-    //             ->where('id', $request->order_id)
-    //             ->first();
-    //         if (!$order) {
-    //             return response()->json(['error' => 'Order tidak ditemukan'], 404);
-    //         }
-
-    //         $items = [];
-    //         foreach ($order->order_detail as $detail) {
-    //             $items[] = [
-    //                 'id' => $detail->product_id,
-    //                 'price' => $detail->price_at_order,
-    //                 'quantity' => $detail->quantity,
-    //                 'name' => Str::limit(preg_replace('/[^A-Za-z0-9 ]/', '', $detail->product->name), 50),
-    //             ];
-    //         }
-
-    //         $address = $order->address_id ? \App\Models\user_addresses::find($order->address_id) : null;
-
-    //         $params = [
-    //             'transaction_details' => [
-    //                 'order_id' => $order->reference_number,
-    //                 'gross_amount' => max($order->total_price, 100),
-    //             ],
-    //             'item_details' => $items,
-    //             'customer_details' => [
-    //                 'first_name' => $order->user->name,
-    //                 'email' => $order->user->email,
-    //                 'shipping_address' => $address ? [
-    //                     'first_name'   => $address->name,
-    //                     'phone'        => $address->phone,
-    //                     'address'      => $address->address,
-    //                     'city'         => $address->city,
-    //                     'postal_code'  => $address->post_code,
-    //                     'country_code' => 'IDN',
-    //                 ] : [],
-    //             ],
-    //         ];
-
-    //         $snapToken = Snap::getSnapToken($params);
-
-    //         return response()->json([
-    //             'snapToken' => $snapToken,
-    //             'order_id' => $order->id,
-    //         ]);
-    //     } catch (Exception $e) {
-    //         return response()->json([
-    //             'error' => true,
-    //             'message' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
+    
     public function createSnapToken(Request $request)
     {
         $user = auth()->user();

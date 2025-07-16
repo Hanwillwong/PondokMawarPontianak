@@ -15,8 +15,19 @@
             <h5 class="mb-3">Order Summary</h5>
             <div class="mb-2"><strong>Order Number:</strong> {{ $order->reference_number }}</div>
             <div class="mb-2"><strong>Date:</strong> {{ \Carbon\Carbon::parse($order->created_at)->format('d M Y') }}</div>
-            <div class="mb-2"><strong>Payment Method:</strong> {{ strtoupper($order->payment_method) }}</div>
-            <div class="mb-2"><strong>Shipping:</strong> {{ $order->purchase_type === 'delivery' ? 'Delivery to Address' : 'Pickup at Store' }}</div>
+            <div class="mb-2"><strong>Payment Method:</strong> 
+              @if ($order->payment_method === 'midtrans' && $midtrans)
+                  {{ strtoupper($midtrans->payment_type) }}
+                  
+                  {{-- Tambahan keterangan untuk VA --}}
+                  @if ($midtrans->payment_type === 'bank_transfer' && isset($midtrans->va_numbers[0]))
+                  - {{ strtoupper($midtrans->va_numbers[0]->bank) }}
+                  @endif
+
+              @else
+                  {{ strtoupper($order->payment_method) }}
+              @endif
+            </div>
             <div><strong>Total:</strong> Rp{{ number_format($order->total_price, 0, ',', '.') }}</div>
         </div>
 

@@ -39,6 +39,15 @@ class AdminController extends Controller
 
         $totalAmount = $pickupAmount + $deliveryAmount;
 
+        
+        $ongoingCount = orders::where('purchase_type', 'delivery')
+            ->whereIn('status_id', [10, 11, 3, 4]) //ongoing
+            ->count();
+
+        $ongoingAmount = orders::where('purchase_type', 'delivery')
+            ->whereIn('status_id', [10, 11, 3, 4]) //ongoing
+            ->sum('total_price');
+
 
         $type = $request->input('type'); // pickup / delivery / null
 
@@ -65,7 +74,7 @@ class AdminController extends Controller
 
         $orders = $ordersQuery->paginate(10);
 
-        return view("dashboard.dashboard", compact('pickupCount','deliveryCount','totalCount','orders','totalAmount','pickupAmount','deliveryAmount','completedCount','completedAmount'));
+        return view("dashboard.dashboard", compact('pickupCount','deliveryCount','ongoingAmount','ongoingCount','totalCount','orders','totalAmount','pickupAmount','deliveryAmount','completedCount','completedAmount'));
     }
 
     public function show($id)

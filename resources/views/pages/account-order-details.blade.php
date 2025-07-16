@@ -71,7 +71,19 @@
                             <p class="mb-1"><strong>Status:</strong> 
                                 <span class="badge bg-info">{{ strtoupper($order->status->label) }}</span>
                             </p>
-                            <p class="mb-1"><strong>Metode Pembayaran:</strong> {{ strtoupper($order->payment_method) }}</p>
+                            <p class="mb-1"><strong>Metode Pembayaran:</strong> 
+                                @if ($order->payment_method === 'midtrans' && $midtrans)
+                                    {{ strtoupper($midtrans->payment_type) }}
+                                    
+                                    {{-- Tambahan keterangan untuk VA --}}
+                                    @if ($midtrans->payment_type === 'bank_transfer' && isset($midtrans->va_numbers[0]))
+                                    - {{ strtoupper($midtrans->va_numbers[0]->bank) }}
+                                    @endif
+
+                                @else
+                                    {{ strtoupper($order->payment_method) }}
+                                @endif
+                            </p>
                             <p class="mb-1"><strong>Jenis Pembelian:</strong> {{ strtoupper($order->purchase_type) }}</p>
                         </div>
 

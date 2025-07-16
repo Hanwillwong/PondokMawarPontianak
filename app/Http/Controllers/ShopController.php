@@ -69,8 +69,8 @@ class ShopController extends Controller
     public function search(Request $request)
     {
         $keyword = strtolower($request->input('q'));
-        $brands = brands::all();
-        $categories = categories::with('sampleProduct')->get();
+        $brands = brands::withCount('products')->get();
+        $categories = categories::with('sampleProduct')->withCount('products')->get();
 
         $allProducts = products::with(['brand', 'supplier', 'category'])->get();
 

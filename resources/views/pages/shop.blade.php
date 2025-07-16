@@ -1,6 +1,8 @@
 @extends('layouts.main')
 @section('container')
 
+
+
 <main class="pt-90">
     <section class="shop-main container d-flex pt-2">
         <form method="GET" action="{{ route('shop') }}" id="filter-form">
